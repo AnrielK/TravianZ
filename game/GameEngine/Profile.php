@@ -334,11 +334,12 @@ class Profile {
         // and quest 3 could not be finished. Remove apostrophes, turn other disallowed characters into
         // spaces and collapse spaces; the result is still checked by the original pattern below.
         $newName = preg_replace("/['\x{2018}\x{2019}`\x{00B4}]/u", '', $newName) ?? $newName;
-        $newName = preg_replace('/[^\p{L}\p{N}._\-\[\]() ]/u', ' ', $newName) ?? $newName;
+        // (no \p{..} inside [..]: the PCRE in the iOS build does not match such classes – alternation instead)
+        $newName = preg_replace('/(?!\p{L}|\p{N}|[._\-\[\]() ])./su', ' ', $newName) ?? $newName;
         $newName = trim(preg_replace('/ {2,}/', ' ', $newName) ?? $newName);
         if ($newName === '') continue;
 
-        if (!preg_match('/^[\p{L}\p{N}._\-\[\]()]+(?: [\p{L}\p{N}._\-\[\]()]+)*$/u', $newName)) {
+        if (!preg_match('/^(?:\p{L}|\p{N}|[._\-\[\]()])+(?: (?:\p{L}|\p{N}|[._\-\[\]()])+)*$/u', $newName)) {
             continue;   // nume respins, satul isi pastreaza numele vechi
         }
 
