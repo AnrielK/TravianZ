@@ -1,0 +1,67 @@
+Building for debugging...
+[0/8] /Users/runner/work/TravianZ/TravianZ/Packages/TravianZCore/.build/arm64-apple-macosx/debug/TravianZCorePackageTests.derived/runner.swift
+[0/8] Write sources
+[4/8] Copying Fixtures
+[5/8] Write swift-version-1977FEB4D2752686.txt
+[7/13] Emitting module TravianZCore
+[8/13] Compiling TravianZCore ControlModels.swift
+[9/13] Compiling TravianZCore DevTools.swift
+[10/13] Compiling TravianZCore InstallForm.swift
+[11/13] Compiling TravianZCore Installer.swift
+[12/14] Compiling TravianZCore WorldSettings.swift
+[13/17] Emitting module TravianZCoreTests
+[14/17] Compiling TravianZCoreTests TravianZCoreTests.swift
+[15/17] Compiling TravianZCoreTests resource_bundle_accessor.swift
+[16/19] Emitting module TravianZCorePackageTests
+[17/19] Compiling TravianZCorePackageTests runner.swift
+[17/19] Write Objects.LinkFileList
+[18/19] Linking TravianZCorePackageTests
+Build complete! (34.96s)
+Test Suite 'All tests' started at 2026-10-16 06:28:30.261.
+Test Suite 'TravianZCorePackageTests.xctest' started at 2026-10-16 06:28:30.263.
+Test Suite 'ControlModelTests' started at 2026-10-16 06:28:30.263.
+Test Case '-[TravianZCoreTests.ControlModelTests testDecodeStatus]' started.
+Test Case '-[TravianZCoreTests.ControlModelTests testDecodeStatus]' passed (0.009 seconds).
+Test Case '-[TravianZCoreTests.ControlModelTests testDecodeTickAndSQL]' started.
+Test Case '-[TravianZCoreTests.ControlModelTests testDecodeTickAndSQL]' passed (0.001 seconds).
+Test Case '-[TravianZCoreTests.ControlModelTests testServerSentEvents]' started.
+Test Case '-[TravianZCoreTests.ControlModelTests testServerSentEvents]' passed (0.002 seconds).
+Test Suite 'ControlModelTests' passed at 2026-10-16 06:28:30.277.
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.012 (0.014) seconds
+Test Suite 'DevToolTests' started at 2026-10-16 06:28:30.277.
+Test Case '-[TravianZCoreTests.DevToolTests testTargets]' started.
+Test Case '-[TravianZCoreTests.DevToolTests testTargets]' passed (0.001 seconds).
+Test Suite 'DevToolTests' passed at 2026-10-16 06:28:30.279.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.001 (0.002) seconds
+Test Suite 'InstallFormTests' started at 2026-10-16 06:28:30.279.
+Test Case '-[TravianZCoreTests.InstallFormTests testDefaultsMatchPythonParser]' started.
+Test Case '-[TravianZCoreTests.InstallFormTests testDefaultsMatchPythonParser]' passed (0.014 seconds).
+Test Case '-[TravianZCoreTests.InstallFormTests testEntities]' started.
+Test Case '-[TravianZCoreTests.InstallFormTests testEntities]' passed (0.000 seconds).
+Test Case '-[TravianZCoreTests.InstallFormTests testKnownDefaults]' started.
+Test Case '-[TravianZCoreTests.InstallFormTests testKnownDefaults]' passed (0.009 seconds).
+Test Case '-[TravianZCoreTests.InstallFormTests testSelectRules]' started.
+Test Case '-[TravianZCoreTests.InstallFormTests testSelectRules]' passed (0.001 seconds).
+Test Suite 'InstallFormTests' passed at 2026-10-16 06:28:30.304.
+	 Executed 4 tests, with 0 failures (0 unexpected) in 0.024 (0.025) seconds
+Test Suite 'WorldSettingsTests' started at 2026-10-16 06:28:30.304.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testCodableRoundTrip]' started.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testCodableRoundTrip]' passed (0.000 seconds).
+Test Case '-[TravianZCoreTests.WorldSettingsTests testFormEncoding]' started.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testFormEncoding]' passed (0.000 seconds).
+Test Case '-[TravianZCoreTests.WorldSettingsTests testInstallerForm]' started.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testInstallerForm]' passed (0.001 seconds).
+Test Case '-[TravianZCoreTests.WorldSettingsTests testLiveDefines]' started.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testLiveDefines]' passed (0.000 seconds).
+Test Case '-[TravianZCoreTests.WorldSettingsTests testStartFields]' started.
+Test Case '-[TravianZCoreTests.WorldSettingsTests testStartFields]' passed (0.000 seconds).
+Test Suite 'WorldSettingsTests' passed at 2026-10-16 06:28:30.307.
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'TravianZCorePackageTests.xctest' passed at 2026-10-16 06:28:30.307.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.039 (0.044) seconds
+Test Suite 'All tests' passed at 2026-10-16 06:28:30.307.
+	 Executed 13 tests, with 0 failures (0 unexpected) in 0.039 (0.046) seconds
+◇ Test run started.
+↳ Testing Library Version: 1501
+↳ Target Platform: arm64e-apple-macos14.0
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
