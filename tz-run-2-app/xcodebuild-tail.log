@@ -1,0 +1,60 @@
+    export VERSION_INFO_STRING\=\"@\(\#\)PROGRAM:TravianZ\ \ PROJECT:TravianZ-2\"
+    export WORKSPACE_DIR\=/Users/runner/work/TravianZ/TravianZ/TravianZ.xcodeproj
+    export WRAPPER_EXTENSION\=app
+    export WRAPPER_NAME\=TravianZ.app
+    export WRAPPER_SUFFIX\=.app
+    export WRAP_ASSET_PACKS_IN_SEPARATE_DIRECTORIES\=NO
+    export XCODE_APP_SUPPORT_DIR\=/Applications/Xcode_26.3.app/Contents/Developer/Library/Xcode
+    export XCODE_PRODUCT_BUILD_VERSION\=17C529
+    export XCODE_VERSION_ACTUAL\=2630
+    export XCODE_VERSION_MAJOR\=2600
+    export XCODE_VERSION_MINOR\=2630
+    export XPCSERVICES_FOLDER_PATH\=TravianZ.app/XPCServices
+    export YACC\=yacc
+    export _DISCOVER_COMMAND_LINE_LINKER_INPUTS\=YES
+    export _DISCOVER_COMMAND_LINE_LINKER_INPUTS_INCLUDE_WL\=YES
+    export _LD_MULTIARCH\=YES
+    export _WRAPPER_CONTENTS_DIR_SHALLOW_BUNDLE_NO\=/Contents
+    export _WRAPPER_PARENT_PATH_SHALLOW_BUNDLE_NO\=/..
+    export _WRAPPER_RESOURCES_DIR_SHALLOW_BUNDLE_NO\=/Resources
+    export __DIAGNOSE_DEPRECATED_ARCHS\=YES
+    export __IS_NOT_MACOS\=YES
+    export __IS_NOT_MACOS_macosx\=NO
+    export __IS_NOT_SIMULATOR\=YES
+    export __IS_NOT_SIMULATOR_simulator\=NO
+    export arch\=undefined_arch
+    export variant\=normal
+    /bin/sh -c /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/Script-135442A093A9673124BBCA90.sh
+
+CopySwiftLibs /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    builtin-swiftStdLibTool --copy --verbose --scan-executable /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/TravianZ --scan-folder /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/Frameworks --scan-folder /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/PlugIns --scan-folder /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/SystemExtensions --scan-folder /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/Extensions --platform iphoneos --toolchain /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.IfJmr6/Metal.xctoolchain --toolchain /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain --destination /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/Frameworks --strip-bitcode --strip-bitcode-tool /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/bitcode_strip --emit-dependency-info /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/SwiftStdLibToolInputDependencies.dep --filter-for-swift-os --back-deploy-swift-span
+Ignoring --strip-bitcode because --sign was not passed
+
+ExtractAppIntentsMetadata (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.3.7003.10.IfJmr6/Metal.xctoolchain --module-name TravianZ --sdk-root /Applications/Xcode_26.3.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk --xcode-version 17C529 --platform-family iOS --deployment-target 17.0 --bundle-identifier com.anriel.travianz --output /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app --target-triple arm64-apple-ios17.0 --binary-file /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/TravianZ --dependency-file /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/Objects-normal/arm64/TravianZ_dependency_info.dat --stringsdata-file /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/Objects-normal/arm64/TravianZ.SwiftFileList --metadata-file-list /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/TravianZ.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/TravianZ.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/Objects-normal/arm64/TravianZ.SwiftConstValuesFileList --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-10-16 05:33:14.097 appintentsmetadataprocessor[14454:45010] Starting appintentsmetadataprocessor export
+2026-10-16 05:33:14.105 appintentsmetadataprocessor[14454:45010] warning: Metadata extraction skipped. No AppIntents.framework dependency found.
+
+AppIntentsSSUTraining (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    /Applications/Xcode_26.3.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsnltrainingprocessor --infoplist-path /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/Info.plist --temp-dir-path /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/ssu --bundle-id com.anriel.travianz --product-path /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app --extracted-metadata-path /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app/Metadata.appintents --metadata-file-list /Users/runner/work/TravianZ/TravianZ/build-device/Build/Intermediates.noindex/TravianZ.build/Release-iphoneos/TravianZ.build/TravianZ.DependencyMetadataFileList --archive-ssu-assets
+2026-10-16 05:33:14.225 appintentsnltrainingprocessor[14459:45022] Parsing options for appintentsnltrainingprocessor
+2026-10-16 05:33:14.225 appintentsnltrainingprocessor[14459:45022] No AppShortcuts found - Skipping.
+
+RegisterExecutionPolicyException /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    builtin-RegisterExecutionPolicyException /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app
+
+Validate /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    builtin-validationUtility /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app -shallow-bundle -infoplist-subpath Info.plist
+
+Touch /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app (in target 'TravianZ' from project 'TravianZ')
+    cd /Users/runner/work/TravianZ/TravianZ
+    /usr/bin/touch -c /Users/runner/work/TravianZ/TravianZ/build-device/Build/Products/Release-iphoneos/TravianZ.app
+
+note: Run script build phase 'Bundle TravianZ, PHP router, MariaDB share and data template' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'TravianZ' from project 'TravianZ')
+** BUILD SUCCEEDED **
+
