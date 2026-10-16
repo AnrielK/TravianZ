@@ -1,0 +1,73 @@
+CMake Warning (deprecated) at CMakeLists.txt:18 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- The C compiler identification is AppleClang 17.0.0.17000013
+-- The ASM compiler identification is AppleClang
+-- Found assembler: /usr/bin/cc
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Warning (deprecated) at CMakeLists.txt:81 (message):
+  The option PNG_EXECUTABLES has been deprecated in favour of PNG_TOOLS
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Building for target architecture: arm64
+-- Found ZLIB: /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk/usr/lib/libz.tbd (found version "1.2.12")
+-- Found AWK program: /usr/bin/awk
+-- Configuring done (2.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/libpng/_b
+[  0%] Built target png_genfiles
+[  6%] Building C object CMakeFiles/png_static.dir/png.c.o
+[ 12%] Building C object CMakeFiles/png_static.dir/pngerror.c.o
+[ 18%] Building C object CMakeFiles/png_static.dir/pngget.c.o
+[ 25%] Building C object CMakeFiles/png_static.dir/pngmem.c.o
+[ 31%] Building C object CMakeFiles/png_static.dir/pngpread.c.o
+[ 37%] Building C object CMakeFiles/png_static.dir/pngread.c.o
+[ 43%] Building C object CMakeFiles/png_static.dir/pngrio.c.o
+[ 50%] Building C object CMakeFiles/png_static.dir/pngrtran.c.o
+[ 56%] Building C object CMakeFiles/png_static.dir/pngrutil.c.o
+[ 62%] Building C object CMakeFiles/png_static.dir/pngset.c.o
+[ 68%] Building C object CMakeFiles/png_static.dir/pngtrans.c.o
+[ 75%] Building C object CMakeFiles/png_static.dir/pngwio.c.o
+[ 81%] Building C object CMakeFiles/png_static.dir/pngwrite.c.o
+[ 93%] Building C object CMakeFiles/png_static.dir/pngwtran.c.o
+[ 93%] Building C object CMakeFiles/png_static.dir/pngwutil.c.o
+[100%] Linking C static library libpng16.a
+[100%] Built target png_static
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/libpng16.a
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/libpng.a
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/png.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/pngconf.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/pnglibconf.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/libpng16/png.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/libpng16/pngconf.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/include/libpng16/pnglibconf.h
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/bin/libpng-config
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/bin/libpng16-config
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/share/man/man3/libpng.3
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/share/man/man3/libpngpf.3
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/share/man/man5/png.5
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/pkgconfig/libpng.pc
+-- Up-to-date: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/bin/libpng-config
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/pkgconfig/libpng16.pc
+-- Up-to-date: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/bin/libpng16-config
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/libpng/libpng16.cmake
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/libpng/libpng16-release.cmake
+-- Up-to-date: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/libpng16.a
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/cmake/PNG/PNGTargets.cmake
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/cmake/PNG/PNGTargets-release.cmake
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/cmake/PNG/PNGConfig.cmake
+-- Installing: /Users/runner/work/TravianZ/TravianZ/ios/php/build/iphoneos/prefix/lib/cmake/PNG/PNGConfigVersion.cmake
