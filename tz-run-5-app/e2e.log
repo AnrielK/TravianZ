@@ -1,0 +1,27 @@
+[01] server ready
+    {"installed": true, "db": {"ok": true, "version": "11.4.13-MariaDB", "tables": 82}, "users": 1, "villages": 3, "tiles": 10201, "settings": {"SPEED": "10", "WORLD_MAX": "50", "SERVER_GP": "gpack/travian_default/", "HOMEPAGE": "http://127.0.0.1:8080/", "TB_PREFIX": "s1_", "SERVER_LANG": "en", "TIMEZONE": "GMT", "COMMENCE": "1792131858"}}
+[02] landing pages (logged out)
+[03] register two players
+    uids 7, 8
+[04] log in
+[05] game pages
+[06] upgrade a resource field and finish it via the automation tick
+    field 1: level 0 -> 1, queue 0
+[07] quest 3: rename the village (iOS keyboard apostrophe)
+    POST spieler.php -> 200 http://127.0.0.1:8080/spieler.php?uid=8
+    village name "Bravo31876's village", quest -3
+    selftest: {"ok": true, "php": "8.3.35", "pcre": "10.42 2022-12-12", "zts": 1, "os": "Darwin", "pcre_jit": false, "mb_internal": "UTF-8", "ascii": 1, "u_flag": 1, "prop_L": 1, "prop_L_cz": 1, "game_pattern": 0, "preg_error": "No error", "replace_quote": "Bravos", "replace_error": "No error", "mb_strlen": 7, "mb_substr": "Ořechov"}
+   FAIL: village rename not saved: "Bravo31876's village"; sql_mode/version [['NO_ENGINE_SUBSTITUTION', '11.4.13-MariaDB', 'e2e-ort']]; response "TravianZ window.addEvent('domready', start); 37.tpl ============ --> No hero yet 37.tpl ============ --> No hero yet 37_adventures.tpl ============ --> 0 Adventures: 0 37.tpl ============ --> Resources: 0 37_auction.tpl ============ --> Silver: 0 200 Gold 200 0 Silver 0 P l u s .day_image { backgrou"
+   FAIL: quest 3 not completed after the rename: '{"markup":"\\n\\t\\t<div id=\\"qstd\\"><h1> <img class=\\"point\\" src=\\"img\\/x.gif\\" alt=\\"\\" title=\\"\\"\\/>Task 3: Your Village`s Name<\\/h1><br \\/><i>&rdquo;Creative as you are you can grant your village th'
+[08] message between players
+[09] send troops (raid) and let them arrive
+    movements: 1
+    reports for attacker: 1
+[10] admin panel
+[11] automation tick is healthy
+    3 ticks in 0.20 s
+[12] log out
+
+E2E FAILED (2 problems)
+ - village rename not saved: "Bravo31876's village"; sql_mode/version [['NO_ENGINE_SUBSTITUTION', '11.4.13-MariaDB', 'e2e-ort']]; response "TravianZ window.addEvent('domready', start); 37.tpl ============ --> No hero yet 37.tpl ============ --> No hero yet 37_adventures.tpl ============ --> 0 Adventures: 0 37.tpl ============ --> Resources: 0 37_auction.tpl ============ --> Silver: 0 200 Gold 200 0 Silver 0 P l u s .day_image { backgrou"
+ - quest 3 not completed after the rename: '{"markup":"\\n\\t\\t<div id=\\"qstd\\"><h1> <img class=\\"point\\" src=\\"img\\/x.gif\\" alt=\\"\\" title=\\"\\"\\/>Task 3: Your Village`s Name<\\/h1><br \\/><i>&rdquo;Creative as you are you can grant your village th'
