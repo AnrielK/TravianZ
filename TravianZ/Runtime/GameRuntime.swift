@@ -245,7 +245,9 @@ final class GameRuntime {
             "--character-sets-dir=\(Paths.mariadbShare.appendingPathComponent("charsets").path)/",
             "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci",
             "--lower-case-table-names=1",          // must match ios/mariadb/make-template.sh
-            "--sql-mode=",                         // like docker-compose.yml (command: --sql_mode="")
+            // TravianZ needs a non-strict server (docker-compose.yml runs it with sql_mode=""): e.g. the profile
+            // form stores birthday '0'; in strict mode that UPDATE fails and the village name is lost too.
+            "--sql-mode=NO_ENGINE_SUBSTITUTION",
             "--skip-name-resolve", "--skip-stack-trace",
             // InnoDB reserves address space for innodb_buffer_pool_size_max up front; the default is derived
             // from RAM and iOS refuses such a mapping ("Cannot map …").

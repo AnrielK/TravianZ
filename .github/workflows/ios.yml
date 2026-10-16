@@ -238,6 +238,7 @@ jobs:
               { head -n 150 "$LOGS/$f"; echo "……"; tail -n 200 "$LOGS/$f"; } | grep -v " Accepted$\| Closing$" > "$R/app-$f"
             done
             ls -la "$DATA" "$LOGS" "$DATA/www" > "$R/app-files.txt" 2>&1
+            for f in "$DATA"/www/var/log/*.log; do [ -s "$f" ] && tail -n 200 "$f" > "$R/game-$(basename "$f")"; done
           fi
           [ -n "$UDID" ] && xcrun simctl spawn "$UDID" log show --last 10m --predicate 'process == "TravianZ"' --style compact 2>/dev/null | tail -n 300 > "$R/app-oslog.log"
           ls ~/Library/Logs/DiagnosticReports 2>/dev/null | grep -i travianz | head -3 | while read c; do cp ~/Library/Logs/DiagnosticReports/"$c" "$R/"; done

@@ -6,6 +6,7 @@
 #   scripts/run-local.sh stop
 #   scripts/run-local.sh reset     # stop + delete .local/
 #
+# TZ_PHP=<php binary>: use that PHP with -n (no php.ini) – e.g. a ZTS build configured like ios/php.
 # Needs: php 8.3 (mysqli, mbstring, gd), mariadb (mariadbd + mariadb-install-db), python3, rsync.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -57,7 +58,7 @@ ROOT_USER=(); [[ "$(id -u)" == 0 ]] && ROOT_USER=(--user=root)   # containers ru
 "$MDB_BIN/mariadbd" --no-defaults "${ROOT_USER[@]}" --datadir="$L/mariadb" --socket="$SOCK" --skip-networking \
    --pid-file="$L/run/mariadbd.pid" --log-error="$L/logs/mariadb.log" --tmpdir="$L/tmp" \
    --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --lower-case-table-names=1 \
-   --sql-mode="" --innodb-buffer-pool-size=48M --innodb-flush-log-at-trx-commit=2 --skip-name-resolve > /dev/null 2>&1 &
+   --sql-mode=NO_ENGINE_SUBSTITUTION --innodb-buffer-pool-size=48M --innodb-flush-log-at-trx-commit=2 --skip-name-resolve > /dev/null 2>&1 &
 for _ in $(seq 1 120); do mariadb --no-defaults -S "$SOCK" -uroot -e 'SELECT 1' >/dev/null 2>&1 && break; sleep 0.5; done
 if [[ "${NEW_DB:-0}" == 1 ]]; then
   mariadb --no-defaults -S "$SOCK" -uroot <<SQL
@@ -71,7 +72,7 @@ fi
 # ---- PHP ----
 export TZ_CONTROL_TOKEN="$TOKEN" TZ_DB_HOST=localhost TZ_DB_USER=travianz TZ_DB_PASSWORD="$DB_PASS" TZ_DB_NAME=travianz
 export TMPDIR="$L/tmp"
-php -d "mysqli.default_socket=$SOCK" -d "pdo_mysql.default_socket=$SOCK" \
+"${TZ_PHP:-php}" ${TZ_PHP:+-n} -d "mysqli.default_socket=$SOCK" -d "pdo_mysql.default_socket=$SOCK" \
     -d display_errors=0 -d log_errors=1 -d "error_log=$L/logs/php-errors.log" -d error_reporting=E_ALL \
     -d memory_limit=512M -d max_execution_time=0 -d "session.save_path=$L/sessions" \
     -d date.timezone="${TZ_TIMEZONE:-Europe/Prague}" -d opcache.enable=0 -d opcache.enable_cli=0 \

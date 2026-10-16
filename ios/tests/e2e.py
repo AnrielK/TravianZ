@@ -204,14 +204,16 @@ def main():
     sql(f"UPDATE s1_users SET quest = 3 WHERE id = {uid2}")
     p2.page("dorf1.php")
     p2.page("spieler.php?s=1")
-    p2.page("spieler.php", {"ft": "p1", "mw": "0", "tag": "", "monat": "", "jahr": "", "ort": "", "be1": "", "be2": "",
+    code, url, resp = p2.req("spieler.php", {"ft": "p1", "mw": "0", "tag": "", "monat": "", "jahr": "", "ort": "e2e-ort", "be1": "", "be2": "",
                             "dname0": "Bravo\u2019s Hrad!", "s1": "ok"})
+    print(f"    POST spieler.php -> {code} {url}")
     vname = scalar(f"SELECT name FROM s1_vdata WHERE wref = {wref2}")
     _, _, q = p2.req("ajax.php?f=qst")
     num = re.search(r'"number":"?(-?\d+)', q)
     print(f"    village name {vname!r}, quest {num and num.group(1)}")
     if vname != "Bravos Hrad":
-        fail(f"village rename not saved: {vname!r}")
+        mode = sql(f"SELECT @@GLOBAL.sql_mode, @@version, (SELECT location FROM s1_users WHERE id = {uid2})")
+        fail(f"village rename not saved: {vname!r}; sql_mode/version {mode}; response {text_of(resp)[:300]!r}")
     if not num or num.group(1) != "3":
         fail(f"quest 3 not completed after the rename: {q[:200]!r}")
 
