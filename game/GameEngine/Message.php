@@ -1,0 +1,1678 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : Message.php                      	                       ##
+##  Type           : Message System Backend                                    ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : Dzoki           			                               ##
+##  Refactored by  : Shadow & Ferywir									       ##
+##  Thanks to      : ronix, InCube, Akakori, Elmar & Kirilloid                 ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  URLs:          : https://travianz.org                                      ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+class Message
+{
+    public $unread, $nunread = false;
+    public $note;
+
+    public $inbox = [];
+    public $inbox1 = [];
+    public $sent = [];
+    public $sent1 = [];
+    public $reading = [];
+    public $reply = [];
+    public $archived = [];
+    public $archived1 = [];
+    public $noticearray = [];
+    public $readingNotice = [];
+
+    private $totalMessage;
+
+    public function __construct()
+    {
+        $req_file = basename($_SERVER['PHP_SELF']);
+
+        $this->unread  = $this->checkUnread();
+        $this->nunread = $this->checkNUnread();
+
+        if ($req_file == 'nachrichten.php') {
+            if (isset($_GET['t'])) {
+                switch ($_GET['t']) {
+
+                    // Sent messages page / single sent message
+                    case 2:
+                    case '2a':
+                        $this->getMessages(2);
+                        break;
+
+                    // Archived messages page
+                    case 3:
+                        $this->getMessages(3);
+                        break;
+                }
+            } else {
+                // Inbox / received messages page
+                $this->getMessages(1);
+            }
+        }
+        if ($req_file == 'berichte.php') {
+            $this->getNotice();
+        }
+        if (isset($_SESSION['reply'])) {
+            $this->reply = $_SESSION['reply'];
+            unset($_SESSION['reply']);
+        }
+    }
+
+    public function procMessage($post)
+    {
+        if (!isset($post['ft'])) {
+            return;
+        }
+        switch ($post['ft']) {
+            case "m1":
+                $this->quoteMessage($post['id']);
+                break;
+            case "m2":
+                if ($post['an'] == "[ally]") {
+                    $this->sendAMessage(
+                        $post['be'],
+                        addslashes($post['message'])
+                    );
+                } else {
+                    $this->sendMessage(
+                        $post['an'],
+                        $post['be'],
+                        addslashes($post['message'])
+                    );
+                }
+                header("Location: nachrichten.php?t=2");
+                exit;
+            case "m3":
+            case "m4":
+            case "m5":
+                if (isset($post['delmsg'])) {
+                    $this->removeMessage($post);
+                }
+                if (isset($post['archive'])) {
+                    $this->archiveMessage($post);
+                }
+                if (isset($post['start'])) {
+                    $this->unarchiveMessage($post);
+                }
+                break;
+            case "m6":
+                $this->createNote($post);
+                break;
+            case "m7":
+                $this->addFriends($post);
+                break;
+        }
+    }
+
+    public function noticeType($get)
+    {
+        global $session, $database;
+        if (isset($get['t'])) {
+            switch ($get['t']) {
+                case 1:
+                    $type = [8, 15, 16, 17];
+                    break;
+                case 2:
+                    $type = [10, 11, 12, 13];
+                    break;
+                case 3:
+                    $type = [1, 2, 3, 4, 5, 6, 7];
+                    break;
+                case 4:
+                    $type = [0, 18, 19, 20, 21, 24, 25];
+                    break;
+                case 5:
+                    if (!$session->plus) {
+                        header("Location: berichte.php");
+                        exit;
+                    }
+                    $type = 9;
+                    break;
+                default:
+                    $type = [];
+                    break;
+            }
+            if (!is_array($type)) {
+                $type = [$type];
+            }
+
+            /**
+             * Filtru suplimentar dupa REZULTAT, pentru rapoartele de lupta.
+             *
+             * Rapoartele de alianta au deja acest filtru (sabii verzi/galbene);
+             * cele personale nu il aveau, desi informatia exista deja in ntype:
+             *
+             *   1 / 4  castigat fara pierderi (atacator / aparator)
+             *   2 / 5  castigat cu pierderi
+             *   3 / 6 / 7  pierdut
+             *
+             * Nu e nevoie de nicio schimbare in baza de date.
+             */
+            if ((int) $get['t'] === 3 && isset($get['f'])) {
+                $results = array(
+                    1 => array(1, 4),        // victorie fara pierderi
+                    2 => array(2, 5),        // victorie cu pierderi
+                    3 => array(3, 6, 7),     // infrangere
+                );
+
+                $f = (int) $get['f'];
+
+                if (isset($results[$f])) {
+                    // pastram doar tipurile care sunt SI in categorie, SI in rezultat
+                    $type = array_values(array_intersect($type, $results[$f]));
+                }
+            }
+
+            $this->noticearray = $this->filter_by_value(
+                $database->getNotice($session->uid),
+                "ntype",
+                $type
+            );
+        }
+        if (isset($get['id'])) {
+            $this->readingNotice = $this->getReadNotice($get['id']);
+        }
+    }
+
+    public function procNotice($post)
+    {
+        if (isset($post["del_x"])) {
+            $this->removeNotice($post);
+        }
+        if (isset($post['archive_x'])) {
+            $this->archiveNotice($post);
+        }
+        if (isset($post['start_x'])) {
+            $this->unarchiveNotice($post);
+        }
+        if (isset($post['readall'])) {
+            $this->readAllNotices();
+        }
+    }
+
+    public function quoteMessage($id)
+    {
+        foreach ($this->inbox as $message) {
+            if ($message['id'] == $id) {
+                $message = preg_replace('/\[message\]/', '', $message);
+                $message = preg_replace('/\[\/message\]/', '', $message);
+                for ($i = 1; $i <= $message['alliance']; $i++) {
+                    $message = preg_replace('/\[alliance' . $i . '\]/', '[alliance0]', $message);
+                    $message = preg_replace('/\[\/alliance' . $i . '\]/', '[/alliance0]', $message);
+                }
+                for ($i = 0; $i <= $message['player']; $i++) {
+                    $message = preg_replace('/\[player' . $i . '\]/', '[player0]', $message);
+                    $message = preg_replace('/\[\/player' . $i . '\]/', '[/player0]', $message);
+                }
+                for ($i = 0; $i <= $message['coor']; $i++) {
+                    $message = preg_replace('/\[coor' . $i . '\]/', '[coor0]', $message);
+                    $message = preg_replace('/\[\/coor' . $i . '\]/', '[/coor0]', $message);
+                }
+                for ($i = 0; $i <= $message['report']; $i++) {
+                    $message = preg_replace('/\[report' . $i . '\]/', '[report0]', $message);
+                    $message = preg_replace('/\[\/report' . $i . '\]/', '[/report0]', $message);
+                }
+                $this->reply = $_SESSION['reply'] = $message;
+                header(
+                    "Location: nachrichten.php?t=1&id=" .
+                    $message['owner'] .
+                    "&mid=" .
+                    $message['id'] .
+                    "&tid=" .
+                    $message['target']
+                );
+                exit;
+            }
+        }
+    }
+
+    public function loadMessage($id)
+    {
+        global $database, $session;
+        if ($this->findInbox($id)) {
+            foreach ($this->inbox as $message) {
+                if ($message['id'] == $id) {
+                    $this->reading = $message;
+                    break;
+                }
+            }
+        }
+        if ($this->findSent($id)) {
+            foreach ($this->sent as $message) {
+                if ($message['id'] == $id) {
+                    $this->reading = $message;
+                    break;
+                }
+            }
+        }
+
+        if ($session->plus && $this->findArchive($id)) {
+            foreach ($this->archived as $message) {
+                if ($message['id'] == $id) {
+                    $this->reading = $message;
+                    break;
+                }
+            }
+        }
+        if (!empty($this->reading) && $this->reading['viewed'] == 0) {
+            $database->getMessage($id, 4);
+        }
+    }
+
+    /**
+     * Filter array by value except specific value.
+     */
+    private function filter_by_value_except($array, $index, $value)
+    {
+        $newarray = [];
+        if (is_array($array) && count($array) > 0) {
+            foreach ($array as $row) {
+                if (isset($row[$index]) && $row[$index] != $value) {
+                    $newarray[] = $row;
+                }
+            }
+        }
+
+        return $newarray;
+    }
+
+    /**
+     * Filter array by accepted values.
+     */
+    private function filter_by_value($array, $index, $value)
+    {
+        $newarray = [];
+        if (is_array($array) && count($array) > 0) {
+            foreach ($array as $row) {
+                if (
+                    isset($row[$index]) &&
+                    in_array($row[$index], $value)
+                ) {
+                    $newarray[] = $row;
+                }
+            }
+        }
+        return $newarray;
+    }
+
+    private function getNotice()
+    {
+        global $database, $session;
+        $this->noticearray = $this->filter_by_value_except(
+            $database->getNotice($session->uid),
+            "ntype",
+            9
+        );
+    }
+
+    /**
+     * Build selected IDs array from POST.
+     */
+    private function collectSelectedIds($post, $limit = 10)
+    {
+        $ids = [];
+        for ($i = 1; $i <= $limit; $i++) {
+            if (isset($post['n' . $i])) {
+                $ids[] = (int)$post['n' . $i];
+            }
+        }
+        return $ids;
+    }
+
+    private function removeMessage($post)
+    {
+        global $database, $session;
+        $mode5updates = [];
+        $mode7updates = [];
+        $mode8updates = [];
+        for ($i = 1; $i <= 10; $i++) {
+            if (!isset($post['n' . $i])) {
+                continue;
+            }
+            $messageId = (int)$post['n' . $i];
+            // UM-W1: SELECT-ul de ownership mutat in DB (getMessageOwnership).
+            // $messageId e deja cast la int, deci nu mai e nevoie de escape pe tot $post.
+            $message = $database->getMessageOwnership($messageId);
+            if (
+                $message['target'] == $session->uid &&
+                $message['owner'] == $session->uid
+            ) {
+                $mode8updates[] = $messageId;
+            } elseif ($message['target'] == $session->uid) {
+                $mode5updates[] = $messageId;
+            } elseif ($message['owner'] == $session->uid) {
+                $mode7updates[] = $messageId;
+            }
+        }
+        if (!empty($mode5updates)) {
+            $database->getMessage($mode5updates, 5);
+        }
+        if (!empty($mode7updates)) {
+            $database->getMessage($mode7updates, 7);
+        }
+        if (!empty($mode8updates)) {
+            $database->getMessage($mode8updates, 8);
+        }
+        header("Location: nachrichten.php");
+        exit;
+    }
+
+    private function archiveMessage($post)
+    {
+        global $database, $session;
+        $archIDs = $this->collectSelectedIds($post);
+        $database->setArchived($archIDs, (int) $session->uid);
+        header("Location: nachrichten.php");
+        exit;
+    }
+
+    private function unarchiveMessage($post)
+    {
+        global $database, $session;
+        $normIDs = $this->collectSelectedIds($post);
+        $database->setNorm($normIDs, (int) $session->uid);
+        header("Location: nachrichten.php");
+        exit;
+    }
+
+    private function removeNotice($post)
+    {
+        global $database, $session;
+        $removeIDs = $this->collectSelectedIds($post);
+        $database->removeNotice($removeIDs, (int) $session->uid);
+        header("Location: berichte.php");
+        exit;
+    }
+
+    private function archiveNotice($post)
+    {
+        global $database, $session;
+        $archiveIDs = $this->collectSelectedIds($post);
+        $database->archiveNotice($archiveIDs, (int) $session->uid);
+        header("Location: berichte.php");
+        exit;
+    }
+
+    private function unarchiveNotice($post)
+    {
+        global $database, $session;
+        $unarchIDs = $this->collectSelectedIds($post);
+        $database->unarchiveNotice($unarchIDs, (int) $session->uid);
+        header("Location: berichte.php");
+        exit;
+    }
+
+    /**
+     * Buton "Read All" (cerut de Catalin): marcheaza toate rapoartele
+     * necitite ale userului ca citite dintr-o singura actiune, indiferent
+     * de tab/filtru curent - la fel ca removeNotice/archiveNotice/
+     * unarchiveNotice de mai sus (POST + redirect la lista de baza).
+     */
+    private function readAllNotices()
+    {
+        global $database, $session;
+        $database->noticeViewedAll((int) $session->uid);
+        header("Location: berichte.php");
+        exit;
+    }
+
+    private function getReadNotice($id)
+    {
+        global $database, $session;
+        $notice = $database->getNotice2($id);
+
+        // FIX (PHP log): id inexistent (notice sters / link stale) ->
+        // getNotice2() intoarce null -> $notice['uid'] pica cu "Trying to
+        // access array offset on null". Tratam identic cu cazul
+        // "neautorizat" de mai jos (return null).
+        if ($notice === null) {
+            return null;
+        }
+
+        if (
+            $notice['uid'] == $session->uid ||
+            $notice['ally'] == $session->alliance ||
+            // Faza 3 Global Chat (09.09.2026): raport distribuit public in chat-ul
+            // general - vezi berichte.php (acelasi check, la "poarta" de acces) si
+            // Database::shareGlobalChatReport(). Fara linia asta, berichte.php lasa
+            // pagina sa se incarce, dar readingNotice tot pica null pentru un
+            // vizitator din afara aliantei -> template-ul de raport primeste
+            // $message->readingNotice['data'] gol -> toate campurile ies "[?]"/0,
+            // exact ce a raportat Catalin (raport gol la click din chat).
+            $database->isGlobalChatSharedReport($id)
+        ) {
+            if ($notice['uid'] == $session->uid) {
+                $database->noticeViewed($notice['id']);
+            }
+            return $notice;
+        }
+        return null;
+    }
+
+    /**
+     * Not all notices have a corresponding .tpl file.
+     * This method maps them to existing report templates.
+     */
+    public function getReportType($type)
+    {
+        switch ($type) {
+
+            // General attacking reports
+            case 2:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 18:
+            case 20:
+            case 21:
+                return 1;
+
+            // Merchant reports
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+                return 10;
+
+            // Reinforcements attacked
+            case 16:
+            case 17:
+                return 15;
+
+            // No troops returned
+            case 19:
+                return 3;
+
+            // Festive reports
+            case 23:
+                return 22;
+
+            // Settler reports: new village founded / valley occupied (issue #178)
+            case 24:
+            case 25:
+                return 24;
+
+            // Hero adventure report (T4 hero port)
+            case 26:
+                return 26;
+
+            // Hero auction report (T4 hero port)
+            case 27:
+                return 27;
+        }
+        return $type;
+    }
+
+    public function loadNotes()
+    {
+        global $session;
+        $noteFile = "GameEngine/Notes/" . md5($session->username) . ".txt";
+        if (file_exists($noteFile)) {
+            $this->note = file_get_contents($noteFile);
+        } else {
+            $this->note = "";
+        }
+    }
+
+    private function createNote($post)
+    {
+        global $session;
+        if (!$session->plus) {
+            return;
+        }
+        $noteFile = "GameEngine/Notes/" . md5($session->username) . ".txt";
+        $ourFileHandle = fopen($noteFile, 'w');
+        fwrite($ourFileHandle, $post['notizen']);
+        fclose($ourFileHandle);
+    }
+
+    private function getMessages($which)
+    {
+        global $database, $session;
+        switch ($which) {
+            case 1:
+                $this->inbox  = $database->getMessage($session->uid, 1);
+                $this->inbox1 = $database->getMessage($session->uid, 9);
+                break;
+            case 2:
+                $this->sent  = $database->getMessage($session->uid, 2);
+                $this->sent1 = $database->getMessage($session->uid, 10);
+                break;
+            case 3:
+                if ($session->plus) {
+                    $this->archived  = $database->getMessage($session->uid, 6);
+                    $this->archived1 = $database->getMessage($session->uid, 11);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Normalize nested BBCode counters.
+     */
+    private function normalizeMessageTags(&$text, &$alliance, &$player, &$coor, &$report)
+    {
+        for ($i = 0; $i <= $alliance; $i++) {
+            if (
+                preg_match('/\[alliance' . $i . '\]/', $text) &&
+                preg_match('/\[\/alliance' . $i . '\]/', $text)
+            ) {
+                $alliance1 = preg_replace('/\[message\](.*?)\[\/alliance' . $i . '\]/is', '', $text);
+                if (
+                    preg_match('/\[alliance' . $i . '\]/', $alliance1) &&
+                    preg_match('/\[\/alliance' . $i . '\]/', $alliance1)
+                ) {
+                    $j = $i + 1;
+                    $alliance2 = preg_replace('/\[\/alliance' . $i . '\](.*?)\[\/message\]/is', '', $text);
+                    $alliance1 = preg_replace('/\[alliance' . $i . '\]/', '[alliance' . $j . ']', $alliance1);
+                    $alliance1 = preg_replace('/\[\/alliance' . $i . '\]/', '[/alliance' . $j . ']', $alliance1);
+                    $text = $alliance2 . "[/alliance" . $i . "]" . $alliance1;
+                    $alliance++;
+                }
+            }
+        }
+        for ($i = 0; $i <= $player; $i++) {
+            if (
+                preg_match('/\[player' . $i . '\]/', $text) &&
+                preg_match('/\[\/player' . $i . '\]/', $text)
+            ) {
+                $player1 = preg_replace('/\[message\](.*?)\[\/player' . $i . '\]/is', '', $text);
+                if (
+                    preg_match('/\[player' . $i . '\]/', $player1) &&
+                    preg_match('/\[\/player' . $i . '\]/', $player1)
+                ) {
+                    $j = $i + 1;
+                    $player2 = preg_replace('/\[\/player' . $i . '\](.*?)\[\/message\]/is', '', $text);
+                    $player1 = preg_replace('/\[player' . $i . '\]/', '[player' . $j . ']', $player1);
+                    $player1 = preg_replace('/\[\/player' . $i . '\]/', '[/player' . $j . ']', $player1);
+                    $text = $player2 . "[/player" . $i . "]" . $player1;
+                    $player++;
+                }
+            }
+        }
+        for ($i = 0; $i <= $coor; $i++) {
+            if (
+                preg_match('/\[coor' . $i . '\]/', $text) &&
+                preg_match('/\[\/coor' . $i . '\]/', $text)
+            ) {
+                $coor1 = preg_replace('/\[message\](.*?)\[\/coor' . $i . '\]/is', '', $text);
+                if (
+                    preg_match('/\[coor' . $i . '\]/', $coor1) &&
+                    preg_match('/\[\/coor' . $i . '\]/', $coor1)
+                ) {
+                    $j = $i + 1;
+                    $coor2 = preg_replace('/\[\/coor' . $i . '\](.*?)\[\/message\]/is', '', $text);
+                    $coor1 = preg_replace('/\[coor' . $i . '\]/', '[coor' . $j . ']', $coor1);
+                    $coor1 = preg_replace('/\[\/coor' . $i . '\]/', '[/coor' . $j . ']', $coor1);
+                    $text = $coor2 . "[/coor" . $i . "]" . $coor1;
+                    $coor++;
+                }
+            }
+        }
+        for ($i = 0; $i <= $report; $i++) {
+            if (
+                preg_match('/\[report' . $i . '\]/', $text) &&
+                preg_match('/\[\/report' . $i . '\]/', $text)
+            ) {
+                $report1 = preg_replace('/\[message\](.*?)\[\/report' . $i . '\]/is', '', $text);
+                if (
+                    preg_match('/\[report' . $i . '\]/', $report1) &&
+                    preg_match('/\[\/report' . $i . '\]/', $report1)
+                ) {
+                    $j = $i + 1;
+                    $report2 = preg_replace('/\[\/report' . $i . '\](.*?)\[\/message\]/is', '', $text);
+                    $report1 = preg_replace('/\[report' . $i . '\]/', '[report' . $j . ']', $report1);
+                    $report1 = preg_replace('/\[\/report' . $i . '\]/', '[/report' . $j . ']', $report1);
+                    $text = $report2 . "[/report" . $i . "]" . $report1;
+                    $report++;
+                }
+            }
+        }
+    }
+
+    private function sendAMessage($topic, $text)
+    {
+        global $session, $database;
+
+        // Flood protection (UM-W1: query mutat in DB)
+        if ($database->countRecentMessages($session->uid, 60) > 5) {
+            return;
+        }
+
+        $allmembers  = $database->getAllianceMemberIds($session->alliance);
+        $userally    = $database->getUserField($session->uid, "alliance", 0);
+        $permission  = $database->getAllyMessagePermission($session->uid, $session->alliance);
+
+        if (defined('WORD_CENSOR')) {
+            $topic = $this->wordCensor($topic);
+            $text  = $this->wordCensor($text);
+        }
+        if ($topic == "") {
+            $topic = "No subject";
+        }
+        if (
+            !preg_match('/\[message\]/', $text) &&
+            !preg_match('/\[\/message\]/', $text)
+        ) {
+            $text = "[message]" . $text . "[/message]";
+            $alliance = 0;
+            $player   = 0;
+            $coor     = 0;
+            $report   = 0;
+            $this->normalizeMessageTags(
+                $text,
+                $alliance,
+                $player,
+                $coor,
+                $report
+            );
+            if ($permission == 1) {
+                if ($userally > 0) {
+                    foreach ($allmembers as $memberId) {
+                        $database->sendMessage(
+                            $memberId,
+                            $session->uid,
+                            htmlspecialchars(addslashes($topic)),
+                            htmlspecialchars(addslashes($text)),
+                            0,
+                            $alliance,
+                            $player,
+                            $coor,
+                            $report
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    private function sendMessage($recieve, $topic, $text, $security_check = true)
+    {
+        global $session, $database;
+        $user = $database->getUserField($recieve, "id", 1);
+
+        // Flood protection (UM-W1: query mutat in DB)
+        if ($security_check) {
+            if ($database->countRecentMessages($session->uid, 60) > 5) {
+                return;
+            }
+        }
+        if (defined('WORD_CENSOR')) {
+            $topic = $this->wordCensor($topic);
+            $text  = $this->wordCensor($text);
+        }
+        if (empty($topic)) {
+            $topic = "No subject";
+        }
+        if (
+            !preg_match('/\[message\]/', $text) &&
+            !preg_match('/\[\/message\]/', $text)
+        ) {
+            $text = "[message]" . $text . "[/message]";
+            $alliance = 0;
+            $player   = 0;
+            $coor     = 0;
+            $report   = 0;
+            $this->normalizeMessageTags(
+                $text,
+                $alliance,
+                $player,
+                $coor,
+                $report
+            );
+
+            // Default sender
+            $send_as = $session->uid;
+
+            // Support messages
+            $support_from_admin_allowed =
+                ($session->access == ADMIN && ADMIN_RECEIVE_SUPPORT_MESSAGES);
+            if (
+                !empty($_POST['as_support']) &&
+                $support_from_admin_allowed
+            ) {
+                $send_as = 1;
+            }
+			
+            // Multihunter messages
+            if (
+                !empty($_POST['as_multihunter']) &&
+                $session->access == MULTIHUNTER
+            ) {
+                $send_as = 5;
+            }
+            $database->sendMessage(
+                $user,
+                $send_as,
+                htmlspecialchars(addslashes($topic)),
+                htmlspecialchars(addslashes($text)),
+                0,
+                $alliance,
+                $player,
+                $coor,
+                $report
+            );
+        }
+    }
+
+	public function sendWelcome($uid, $username){
+		global $database;
+		/*
+		 * FIX: $bid40 / $bid15 sunt deja incarcate global de Session.php
+		 * (include_once("Data/buidata.php")), care ruleaza pe orice pagina.
+		 * Fara "global" aici, require_once() de mai jos e no-op (fisierul
+		 * e deja inclus o data in script), iar $bid40/$bid15 raman nesetate
+		 * local -> blocul de calcul WW e sarit -> wwBuildSeconds = 0.
+		 */
+		global $bid40, $bid15;
+
+    $welcomemsg = file_get_contents("GameEngine/Admin/welcome.tpl");
+
+    /*
+     * ================================================================
+     * GAME WORLD DATES
+     * ================================================================
+     */
+
+	/*
+	* ================================================================
+	* REAL SERVER START DATE / TIME
+	* ================================================================
+	*
+	* START_DATE and START_TIME are the official world start values
+	* configured in config.php.
+	*
+	* COMMENCE is not used here because it may represent a different
+	* internal timestamp.
+	*/
+
+	$worldStart = strtotime(
+    START_DATE . ' ' . START_TIME
+	);
+
+    /*
+     * Natars spawn
+     *
+     * NATARS_SPAWN_TIME is stored in days.
+     */
+    $natarsDate = $worldStart;
+
+    if (defined('NATARS_SPAWN_TIME')) {
+        $natarsDate = $worldStart + ((int) NATARS_SPAWN_TIME * 86400);
+    }
+
+    /*
+     * World Wonder villages
+     */
+    $wwVillagesDate = $worldStart;
+
+    if (defined('NATARS_WW_SPAWN_TIME')) {
+        $wwVillagesDate = $worldStart + ((int) NATARS_WW_SPAWN_TIME * 86400);
+    }
+
+    /*
+     * World Wonder Construction Plans
+     */
+    $wwPlansDate = $worldStart;
+
+    if (defined('NATARS_WW_BUILDING_PLAN_SPAWN_TIME')) {
+        $wwPlansDate = $worldStart + (
+            (int) NATARS_WW_BUILDING_PLAN_SPAWN_TIME * 86400
+        );
+    }
+
+
+	/*
+	* ================================================================
+	* WORLD WONDER BUILD TIME
+	* ================================================================
+	*
+	* The World Wonder is building gid 40.
+	*
+	* Calculate the complete construction time from level 1
+	* through level 100 using the actual World Wonder times
+	* from buidata.php.
+	*
+	* This calculation follows the same formula used by
+	* getBuildingTime() for normal buildings:
+	*
+	*     base_time
+	*     × (Main Building attri / 100)
+	*     ÷ SPEED
+	*
+	* The World Wonder village is considered to have
+	* Main Building level 20 for this calculation.
+	*/
+
+	$wwBuildSeconds = 0;
+
+	/*
+	* Load building data if it is not already loaded.
+	*
+	* buidata.php contains:
+	*   $bid40 = World Wonder
+	*   $bid15 = Main Building
+	*/
+	if (!isset($bid40) || !isset($bid15)) {
+    require_once("GameEngine/Data/buidata.php");
+	}
+
+	/*
+	* World Wonder construction is calculated using
+	* Main Building level 20.
+	*
+	* This corresponds to the formula in getBuildingTime():
+	*
+	* $dataArray[$level]['time']
+	* * ($bid15[$mainBuilding]['attri'] / 100)
+	* / SPEED
+	*/
+	$mainBuildingLevel = 20;
+
+	if (
+    isset($bid40) &&
+    is_array($bid40) &&
+    isset($bid15) &&
+    is_array($bid15) &&
+    isset($bid15[$mainBuildingLevel]) &&
+    isset($bid15[$mainBuildingLevel]['attri'])
+	) {
+
+    $mainBuildingModifier =
+        ((float) $bid15[$mainBuildingLevel]['attri']) / 100;
+
+    /*
+     * Calculate the total construction time
+     * from World Wonder level 1 to level 100.
+     */
+    for ($level = 1; $level <= 100; $level++) {
+
+        if (
+            !isset($bid40[$level]) ||
+            !isset($bid40[$level]['time'])
+        ) {
+            continue;
+        }
+
+        $baseTime = (float) $bid40[$level]['time'];
+
+        /*
+         * Same formula as getBuildingTime():
+         *
+         * base time
+         * × Main Building modifier
+         * ÷ server speed
+         */
+        $levelBuildTime = round(
+            $baseTime
+            * $mainBuildingModifier
+            / SPEED
+        );
+
+        $wwBuildSeconds += $levelBuildTime;
+		}
+	}
+
+
+    /*
+     * ================================================================
+     * WW START DATE
+     * ================================================================
+     *
+     * The WW cannot start before:
+     *
+     * 1. Natars appear
+     * 2. WW villages appear
+     * 3. Construction Plans appear
+     *
+     * Therefore use the latest of these dates.
+     */
+
+    $wwStartDate = max(
+        $natarsDate,
+        $wwVillagesDate,
+        $wwPlansDate
+    );
+
+
+    /*
+     * ================================================================
+     * WW LEVEL 100 DATE
+     * ================================================================
+     */
+
+    $ww100Date = $wwStartDate + $wwBuildSeconds;
+
+
+    /*
+     * ================================================================
+     * FINAL WORLD END DATE
+     * ================================================================
+     *
+     * Add 5 additional days for:
+     *
+     * - final attacks
+     * - WW setbacks
+     * - possible destruction/downgrade of WW levels
+     *
+     * This is intentionally a safety margin.
+     */
+
+    $worldEndDate = $ww100Date + (5 * 86400);
+
+
+    /*
+     * ================================================================
+     * DATE FORMAT
+     * ================================================================
+     */
+
+    $formatDate = function ($timestamp) {
+        return date("d.m.Y H:i", $timestamp);
+    };
+
+
+    /*
+     * ================================================================
+     * FORMAT WW BUILD TIME
+     * ================================================================
+     */
+
+    $wwBuildTimeDays = floor($wwBuildSeconds / 86400);
+    $wwBuildTimeHours = floor(
+        ($wwBuildSeconds % 86400) / 3600
+    );
+    $wwBuildTimeMinutes = floor(
+        ($wwBuildSeconds % 3600) / 60
+    );
+
+    $wwBuildTimeParts = [];
+
+    if ($wwBuildTimeDays > 0) {
+        $wwBuildTimeParts[] =
+            $wwBuildTimeDays . ' ' .
+            ($wwBuildTimeDays == 1 ? 'day' : 'days');
+    }
+
+    if ($wwBuildTimeHours > 0) {
+        $wwBuildTimeParts[] =
+            $wwBuildTimeHours . ' ' .
+            ($wwBuildTimeHours == 1 ? 'hour' : 'hours');
+    }
+
+    if ($wwBuildTimeMinutes > 0) {
+        $wwBuildTimeParts[] =
+            $wwBuildTimeMinutes . ' ' .
+            ($wwBuildTimeMinutes == 1 ? 'minute' : 'minutes');
+    }
+
+    if (empty($wwBuildTimeParts)) {
+        $wwBuildTime = 'less than 1 minute';
+    } else {
+        $wwBuildTime = implode(', ', $wwBuildTimeParts);
+    }
+
+
+    /*
+     * ================================================================
+     * NATAR TIME
+     * ================================================================
+     *
+     * If Natars appear after at least approximately 2 months,
+     * display the elapsed time in months.
+     *
+     * If they appear sooner, display the exact date instead.
+     */
+
+    $natarSeconds = $natarsDate - $worldStart;
+
+    /*
+     * Average month length used only for displaying
+     * "approximately X months".
+     */
+    $averageMonthSeconds = 30.4375 * 86400;
+
+    $natarMonths = $natarSeconds / $averageMonthSeconds;
+
+    if ($natarMonths >= 2) {
+
+        $roundedNatarMonths = round($natarMonths, 1);
+
+        /*
+         * Remove unnecessary .0
+         */
+        if (
+            floor($roundedNatarMonths) ==
+            $roundedNatarMonths
+        ) {
+            $roundedNatarMonths = (int) $roundedNatarMonths;
+        }
+
+        $natarTime =
+            'approximately ' .
+            $roundedNatarMonths . ' ' .
+            ($roundedNatarMonths == 1 ? 'month' : 'months');
+
+    } else {
+
+        $natarTime =
+            'on ' .
+            date("d.m.Y H:i", $natarsDate);
+    }
+
+
+    /*
+     * ================================================================
+     * TRIBES
+     * ================================================================
+     *
+     * Romans, Gauls and Teutons are always available.
+     *
+     * Additional tribes are displayed only when their corresponding
+     * NEW_FUNCTION constant is enabled.
+     */
+
+    $tribes = [
+        'Romans',
+        'Gauls',
+        'Teutons'
+    ];
+
+    if (
+        defined('NEW_FUNCTION_TRIBE_HUNS') &&
+        NEW_FUNCTION_TRIBE_HUNS
+    ) {
+        $tribes[] = 'Huns';
+    }
+
+    if (
+        defined('NEW_FUNCTION_TRIBE_EGIPTEANS') &&
+        NEW_FUNCTION_TRIBE_EGIPTEANS
+    ) {
+        $tribes[] = 'Egyptians';
+    }
+
+    if (
+        defined('NEW_FUNCTION_TRIBE_SPARTANS') &&
+        NEW_FUNCTION_TRIBE_SPARTANS
+    ) {
+        $tribes[] = 'Spartans';
+    }
+
+    if (
+        defined('NEW_FUNCTION_TRIBE_VIKINGS') &&
+        NEW_FUNCTION_TRIBE_VIKINGS
+    ) {
+        $tribes[] = 'Vikings';
+    }
+
+
+    /*
+     * Human-readable tribe list.
+     *
+     * 3 tribes:
+     * Romans, Gauls and Teutons
+     *
+     * 4 tribes:
+     * Romans, Gauls, Teutons and Huns
+     *
+     * 7 tribes:
+     * Romans, Gauls, Teutons, Huns, Egyptians, Spartans and Vikings
+     */
+
+    $tribeCount = count($tribes);
+
+    if ($tribeCount == 1) {
+
+        $tribesText = $tribes[0];
+
+    } elseif ($tribeCount == 2) {
+
+        $tribesText =
+            $tribes[0] . ' and ' .
+            $tribes[1];
+
+    } else {
+
+        $lastTribe = array_pop($tribes);
+
+        $tribesText =
+            implode(', ', $tribes) .
+            ' and ' .
+            $lastTribe;
+    }
+
+
+    /*
+     * ================================================================
+     * ACTIVE NEW FUNCTIONS
+     * ================================================================
+     *
+     * Only functions that are actually enabled are shown.
+     */
+
+    $activeFunctions = [];
+
+    /*
+     * Function:
+     * Oasis display
+     */
+    if (
+        defined('NEW_FUNCTIONS_OASIS') &&
+        NEW_FUNCTIONS_OASIS
+    ) {
+        $activeFunctions[] = 'Enhanced Oasis Display';
+    }
+
+    /*
+     * Alliance invitations
+     */
+    if (
+        defined('NEW_FUNCTIONS_ALLIANCE_INVITATION') &&
+        NEW_FUNCTIONS_ALLIANCE_INVITATION
+    ) {
+        $activeFunctions[] = 'Alliance Invitation System';
+    }
+
+    /*
+     * Alliance & Embassy mechanics
+     */
+    if (
+        defined('NEW_FUNCTIONS_EMBASSY_MECHANICS') &&
+        NEW_FUNCTIONS_EMBASSY_MECHANICS
+    ) {
+        $activeFunctions[] = 'New Alliance & Embassy Mechanics';
+    }
+
+    /*
+     * Forum post notifications
+     */
+    if (
+        defined('NEW_FUNCTIONS_FORUM_POST_MESSAGE') &&
+        NEW_FUNCTIONS_FORUM_POST_MESSAGE
+    ) {
+        $activeFunctions[] = 'Forum Post Notifications';
+    }
+
+    /*
+     * Tribe images
+     */
+    if (
+        defined('NEW_FUNCTIONS_TRIBE_IMAGES') &&
+        NEW_FUNCTIONS_TRIBE_IMAGES
+    ) {
+        $activeFunctions[] = 'Tribe Images';
+    }
+
+    /*
+     * Multihunter images
+     */
+    if (
+        defined('NEW_FUNCTIONS_MHS_IMAGES') &&
+        NEW_FUNCTIONS_MHS_IMAGES
+    ) {
+        $activeFunctions[] = 'Multihunter Images';
+    }
+
+    /*
+     * Artifact display
+     */
+    if (
+        defined('NEW_FUNCTIONS_DISPLAY_ARTIFACT') &&
+        NEW_FUNCTIONS_DISPLAY_ARTIFACT
+    ) {
+        $activeFunctions[] = 'Artifact Display';
+    }
+
+    /*
+     * World Wonder display
+     */
+    if (
+        defined('NEW_FUNCTIONS_DISPLAY_WONDER') &&
+        NEW_FUNCTIONS_DISPLAY_WONDER
+    ) {
+        $activeFunctions[] = 'World Wonder Display';
+    }
+
+    /*
+     * Vacation Mode
+     */
+    if (
+        defined('NEW_FUNCTIONS_VACATION') &&
+        NEW_FUNCTIONS_VACATION
+    ) {
+        $activeFunctions[] = 'Vacation Mode';
+    }
+
+    /*
+     * Catapult target display
+     */
+    if (
+        defined('NEW_FUNCTIONS_DISPLAY_CATAPULT_TARGET') &&
+        NEW_FUNCTIONS_DISPLAY_CATAPULT_TARGET
+    ) {
+        $activeFunctions[] = 'Catapult Target Display';
+    }
+
+    /*
+     * Nature / Natars manual
+     */
+    if (
+        defined('NEW_FUNCTIONS_MANUAL_NATURENATARS') &&
+        NEW_FUNCTIONS_MANUAL_NATURENATARS
+    ) {
+        $activeFunctions[] = 'Nature & Natars Manual';
+    }
+
+    /*
+     * Direct links
+     */
+    if (
+        defined('NEW_FUNCTIONS_DISPLAY_LINKS') &&
+        NEW_FUNCTIONS_DISPLAY_LINKS
+    ) {
+        $activeFunctions[] = 'Direct Links';
+    }
+
+    /*
+     * 3-year medal
+     */
+    if (
+        defined('NEW_FUNCTIONS_MEDAL_3YEAR') &&
+        NEW_FUNCTIONS_MEDAL_3YEAR
+    ) {
+        $activeFunctions[] = '3-Year Veteran Medal';
+    }
+
+    /*
+     * 5-year medal
+     */
+    if (
+        defined('NEW_FUNCTIONS_MEDAL_5YEAR') &&
+        NEW_FUNCTIONS_MEDAL_5YEAR
+    ) {
+        $activeFunctions[] = '5-Year Veteran Medal';
+    }
+
+    /*
+     * 10-year medal
+     */
+    if (
+        defined('NEW_FUNCTIONS_MEDAL_10YEAR') &&
+        NEW_FUNCTIONS_MEDAL_10YEAR
+    ) {
+        $activeFunctions[] = '10-Year Veteran Medal';
+    }
+
+    /*
+     * Special medals
+     */
+    if (
+        defined('NEW_FUNCTIONS_SPECIAL_MEDALS_SYSTEM') &&
+        NEW_FUNCTIONS_SPECIAL_MEDALS_SYSTEM
+    ) {
+        $activeFunctions[] = 'Special Medals System';
+    }
+
+    /*
+     * Server milestones
+     */
+    if (
+        defined('NEW_FUNCTIONS_MILESTONES') &&
+        NEW_FUNCTIONS_MILESTONES
+    ) {
+        $activeFunctions[] = 'Server Milestones';
+    }
+
+    /*
+     * Medal reset
+     */
+    if (
+        defined('NEW_FUNCTIONS_MEDAL_RESET') &&
+        NEW_FUNCTIONS_MEDAL_RESET
+    ) {
+        $activeFunctions[] = 'Medal Reset Timer';
+    }
+
+    /*
+     * T4 Hero System
+     */
+    if (
+        defined('NEW_FUNCTIONS_HERO_T4') &&
+        NEW_FUNCTIONS_HERO_T4
+    ) {
+        $activeFunctions[] = 'T4 Hero System';
+    }
+
+    /*
+     * Huns
+     */
+    if (
+        defined('NEW_FUNCTION_TRIBE_HUNS') &&
+        NEW_FUNCTION_TRIBE_HUNS
+    ) {
+        $activeFunctions[] = 'Huns';
+    }
+
+    /*
+     * Egyptians
+     */
+    if (
+        defined('NEW_FUNCTION_TRIBE_EGIPTEANS') &&
+        NEW_FUNCTION_TRIBE_EGIPTEANS
+    ) {
+        $activeFunctions[] = 'Egyptians';
+    }
+
+    /*
+     * Spartans
+     */
+    if (
+        defined('NEW_FUNCTION_TRIBE_SPARTANS') &&
+        NEW_FUNCTION_TRIBE_SPARTANS
+    ) {
+        $activeFunctions[] = 'Spartans';
+    }
+
+    /*
+     * Vikings
+     */
+    if (
+        defined('NEW_FUNCTION_TRIBE_VIKINGS') &&
+        NEW_FUNCTION_TRIBE_VIKINGS
+    ) {
+        $activeFunctions[] = 'Vikings';
+    }
+
+    /*
+     * Registration Gold
+     */
+    if (
+        defined('NEW_FUNCTION_REGISTRATION_GOLD') &&
+        NEW_FUNCTION_REGISTRATION_GOLD
+    ) {
+        $activeFunctions[] = 'Registration Gold Bonus';
+    }
+	
+	 /*
+     * Alliance Bonus
+     */
+    if (
+        defined('NEW_FUNCTIONS_ALLIANCE_BONUSES') &&
+        NEW_FUNCTIONS_ALLIANCE_BONUSES
+    ) {
+        $activeFunctions[] = 'Alliance Bonus';
+    }
+	
+	/*
+     * WW Image
+     */
+    if (
+        defined('NEW_FUNCTION_WW_IMAGE') &&
+        NEW_FUNCTION_WW_IMAGE
+    ) {
+        $activeFunctions[] = 'WW Image by Tribe';
+    }
+
+
+    /*
+     * ================================================================
+     * ACTIVE FEATURES HTML
+     * ================================================================
+     */
+
+    if (!empty($activeFunctions)) {
+
+        $activeFunctionsHtml =
+            '<ul style="margin-top:0;margin-bottom:0;">';
+
+        foreach ($activeFunctions as $feature) {
+            $activeFunctionsHtml .=
+                '<li>' .
+                htmlspecialchars($feature, ENT_QUOTES, 'UTF-8') .
+                '</li>';
+        }
+
+        $activeFunctionsHtml .= '</ul>';
+
+    } else {
+
+        $activeFunctionsHtml =
+            '<i>No additional server features are currently active.</i>';
+    }
+
+
+    /*
+     * ================================================================
+     * REPLACE TEMPLATE VARIABLES
+     * ================================================================
+     */
+
+    $welcomemsg = preg_replace(
+        [
+            "'%USER%'",
+            "'%START%'",
+            "'%TIME%'",
+            "'%PLAYERS%'",
+            "'%ALLI%'",
+            "'%SERVER_NAME%'",
+            "'%PROTECTION%'",
+            "'%TRIBES%'",
+            "'%WORLD_END_DATE%'",
+            "'%NATARS_DATE%'",
+            "'%WW_VILLAGES_DATE%'",
+            "'%WW_PLANS_DATE%'",
+            "'%WW_BUILD_TIME%'",
+            "'%WW100_DATE%'",
+            "'%NATAR_TIME%'",
+            "'%ACTIVE_NEW_FUNCTIONS%'"
+        ],
+        [
+            $username,
+            date("d.m.Y", $worldStart),
+            date("H:i", $worldStart),
+            $database->countUser(),
+            $database->countAlli(),
+            SERVER_NAME,
+            round((PROTECTION / 3600)),
+            $tribesText,
+            $formatDate($worldEndDate),
+            $formatDate($natarsDate),
+            $formatDate($wwVillagesDate),
+            $formatDate($wwPlansDate),
+            $wwBuildTime,
+            $formatDate($ww100Date),
+            $natarTime,
+            $activeFunctionsHtml
+        ],
+        $welcomemsg
+    );
+
+    /*
+     * Add message BBCode wrapper.
+     */
+    $welcomemsg = "[message]" . $welcomemsg . "[/message]";
+
+    /*
+     * Send welcome message.
+     */
+    return $database->sendMessage(
+        $uid,
+        1,
+        WEL_TOPIC,
+        addslashes($welcomemsg),
+        0,
+        0,
+        0,
+        0,
+        0
+    );
+	}
+
+    private function wordCensor($text)
+    {
+        $censorarray = explode(",", CENSORED);
+        foreach ($censorarray as $key => $value) {
+            $censorarray[$key] = "/" . $value . "/i";
+        }
+        return preg_replace($censorarray, "****", $text);
+    }
+
+    private function checkUnread()
+    {
+        global $database, $session;
+        return $database->getUnreadMessagesCount($session->uid);
+    }
+
+    private function checkNUnread()
+    {
+        global $database, $session;
+        return $database->getUnreadNoticesCount($session->uid);
+    }
+
+    private function findInbox($id)
+    {
+        if (!empty($this->inbox)) {
+            foreach ($this->inbox as $message) {
+                if ($message['id'] == $id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function findSent($id)
+    {
+        if (!empty($this->sent)) {
+            foreach ($this->sent as $message) {
+                if ($message['id'] == $id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function findArchive($id)
+    {
+        if (!empty($this->archived)) {
+            foreach ($this->archived as $message) {
+                if ($message['id'] == $id) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function addFriends($post)
+    {
+        global $database, $session;
+        // FIX securitate (UM-D1): identitatea proprie se ia din sesiune, NU din
+        // $post['myid'] (hidden field, deci falsificabil de un client modificat).
+        // Inainte, un POST forjat cu alt myid modifica lista de prieteni a altui
+        // jucator (IDOR) - SQL-ul era escapat, dar ownership-ul nu era verificat.
+        $myid = (int) $session->uid;
+        for ($i = 0; $i <= 19; $i++) {
+            if (empty($post['addfriends' . $i])) {
+                continue;
+            }
+            $uid = $database->getUserField(
+                $post['addfriends' . $i],
+                "id",
+                1
+            );
+            $added = 0;
+            for ($j = 0; $j <= $i; $j++) {
+
+                if ($added != 0) {
+                    continue;
+                }
+                $user = $database->getUserField(
+                    $myid,
+                    "friend" . $j,
+                    0
+                );
+                $userwait = $database->getUserField(
+                    $myid,
+                    "friend" . $j . "wait",
+                    0
+                );
+                $exist = 0;
+                for ($k = 0; $k <= 19; $k++) {
+
+                    $user1 = $database->getUserField(
+                        $myid,
+                        "friend" . $k,
+                        0
+                    );
+                    if ($user1 == $uid || $uid == $myid) {
+                        $exist = 1;
+                    }
+                }
+                if (
+                    $user == 0 &&
+                    $userwait == 0 &&
+                    $exist == 0
+                ) {
+                    $added1 = 0;
+                    for ($l = 0; $l <= 19; $l++) {
+                        $user2 = $database->getUserField(
+                            $uid,
+                            "friend" . $l,
+                            0
+                        );
+                        $userwait2 = $database->getUserField(
+                            $uid,
+                            "friend" . $l . "wait",
+                            0
+                        );
+                        if (
+                            $user2 == 0 &&
+                            $userwait2 == 0 &&
+                            $added1 == 0
+                        ) {
+                            $database->addFriend(
+                                $uid,
+                                "friend" . $l . "wait",
+                                $myid
+                            );
+                            $added1 = 1;
+                        }
+                    }
+                    $database->addFriend(
+                        $myid,
+                        "friend" . $j,
+                        $uid
+                    );
+                    $database->addFriend(
+                        $myid,
+                        "friend" . $j . "wait",
+                        $uid
+                    );
+                    $added = 1;
+                }
+            }
+        }
+        header("Location: nachrichten.php?t=1");
+        exit();
+    }
+};

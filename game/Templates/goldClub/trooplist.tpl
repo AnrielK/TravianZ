@@ -1,0 +1,51 @@
+<?php
+
+$start = ($session->tribe - 1) * 10 + 1;
+$end = $session->tribe * 10;
+
+/* build unit list once (keeps alignment safe) */
+global $unitsbytype;
+$units = [];
+
+for ($i = $start; $i <= $end; $i++) {
+
+    // scoutii nu pot fi folositi in farmlist (generic pentru toate triburile)
+    if (in_array($i, $unitsbytype['scout'])) {
+        continue;
+    }
+
+    $units[] = $i;
+}
+
+?>
+
+<table class="transparent" id="raidList" cellspacing="1" cellpadding="1">
+
+    <tr>
+        <?php foreach ($units as $i): ?>
+            <td>
+                <label for="t<?php echo $i - $start + 1; ?>">
+                    <img class="unit u<?php echo $i; ?>"
+                         title="<?php echo $technology->getUnitName($i); ?>"
+                         src="img/x.gif">
+                </label>
+            </td>
+        <?php endforeach; ?>
+    </tr>
+
+    <tr>
+        <?php foreach ($units as $i): ?>
+            <?php $index = $i - $start + 1; ?>
+
+            <td>
+                <input class="text"
+                       id="t<?php echo $index; ?>"
+                       type="text"
+                       name="t<?php echo $index; ?>"
+                       value="<?php echo (isset(${'t'.$index}) && ${'t'.$index} > 0) ? ${'t'.$index} : 0; ?>">
+            </td>
+
+        <?php endforeach; ?>
+    </tr>
+
+</table>

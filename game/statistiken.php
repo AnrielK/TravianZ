@@ -1,0 +1,260 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : statistiken.php                                           ##
+##  Type           : In Game Statistics Frontend                               ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : Dzoki (Original)                                          ##
+##  Refactored by  : Shadow                                                    ##
+##  Redesign by    : Shadow                                                    ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  URLs:          : https://travianz.org                                      ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+
+use App\Utils\AccessLogger;
+
+include_once("GameEngine/Village.php");
+AccessLogger::logRequest();
+
+$__start = $generator->pageLoadTimeStart();
+if(isset($_GET['rank'])){ $_POST['rank']=$_GET['rank']; }
+$_GET['aid'] = $session->alliance;
+$_GET['hero'] = count($database->getHero($session->uid));
+$ranking->procRankReq($_GET);
+$ranking->procRank($_POST);
+if(isset($_GET['newdid'])) {
+	$_SESSION['wid'] = $_GET['newdid'];
+	header("Location: ".$_SERVER['PHP_SELF']."?id=".$_GET['id']);
+	exit;
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title><?php
+	echo SERVER_NAME . ' &raquo; &raquo; &raquo; ' . STATISTICS . ' (';
+
+if (!empty($_GET['id'])) {
+    switch ($_GET['id']) {
+        case '4':
+            echo ALLIANCES;
+            break;
+        case '2':
+            echo VILLAGES;
+            break;
+        case '8':
+            echo HEROES;
+            break;
+        case '50':
+            echo defined('PLUSSTATS_TITLE') ? PLUSSTATS_TITLE : 'Graphical statistics';
+            break;
+        case '0':
+            echo GENERAL;
+            break;
+        case '99':
+            echo WWS;
+            break;
+        case '7':
+            echo TOP10A;
+            break;
+        case '31':
+            echo TOP10PA;
+            break;
+        case '32':
+            echo TOP10PD;
+            break;
+		case '41':
+            echo TOP10AA;
+            break;
+        case '42':
+            echo TOP10AD;
+            break;
+        case '43':
+            echo TOP10A;
+            break;
+        case '1':
+            echo PLAYERS;
+            break;
+		case '3':
+            echo MILESTONES;
+            break;
+    }
+} else {
+    echo PLAYERS;
+}
+
+	echo ')';
+	?></title>
+	<link rel="shortcut icon" href="favicon.ico"/>
+	<meta http-equiv="cache-control" content="max-age=0" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<meta http-equiv="imagetoolbar" content="no" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<script src="mt-full.js?0faab" type="text/javascript"></script>
+	<script src="unx.js?f4b7h" type="text/javascript"></script>
+	<script src="new.js?0faab" type="text/javascript"></script>
+	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
+	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
+	<?php
+	// GP_LOCATE contine deja pachetul efectiv: alegerea jucatorului cand
+	// e permisa si valida, altfel pachetul serverului (vezi config.php).
+	echo "
+	<link href='".GP_LOCATE."travian.css?e21d2' rel='stylesheet' type='text/css' />
+	<link href='".GP_LOCATE."lang/en/lang.css?e21d2' rel='stylesheet' type='text/css' />";
+	?>
+	<script type="text/javascript">
+
+		window.addEvent('domready', start);
+	</script>
+</head>
+
+
+<body class="v35 ie ie8">
+<div class="wrapper">
+<img style="filter:chroma();" src="img/x.gif" id="msfilter" alt="" />
+<div id="dynamic_header">
+	</div>
+<?php include("Templates/header.tpl"); ?>
+<div id="mid">
+<?php include("Templates/menu.tpl"); ?>
+		<div id="content"  class="statistics">
+<h1><?php echo STATISTICS; ?></h1>
+<div id="textmenu">
+   <a href="statistiken.php" <?php if(!isset($_GET['id']) || (isset($_GET['id']) && ($_GET['id'] == 1 || $_GET['id'] == 31 || $_GET['id'] == 32 || $_GET['id'] == 7))) { echo "class=\"selected \""; } ?>><?php echo PLAYER; ?></a>
+ | <a href="statistiken.php?id=4" <?php if(isset($_GET['id']) && ($_GET['id'] == 4 || $_GET['id'] == 41 || $_GET['id'] == 42 || $_GET['id'] == 43)) { echo "class=\"selected \""; } ?>><?php echo ALLIANCES; ?></a>
+ | <a href="statistiken.php?id=2" <?php if(isset($_GET['id']) && $_GET['id'] == 2) { echo "class=\"selected \""; } ?>><?php echo VILLAGES; ?></a>
+ | <a href="statistiken.php?id=8" <?php if(isset($_GET['id']) && $_GET['id'] == 8) { echo "class=\"selected \""; } ?>><?php echo HEROES; ?></a>
+ | <a href="statistiken.php?id=0" <?php if(isset($_GET['id']) && $_GET['id'] == 0) { echo "class=\"selected \""; } ?>><?php echo GENERAL; ?></a>
+<?php if (defined('NEW_FUNCTIONS_MILESTONES') && NEW_FUNCTIONS_MILESTONES): ?>
+ | <a href="statistiken.php?id=3"<?php if (isset($_GET['id']) && $_GET['id'] == 3) echo ' class="selected"'; ?>><?php echo MILESTONES; ?></a>
+<?php endif; ?>
+ <?php if(WW == true) { echo
+ '|'; } else { echo ''; } ?> <a href="statistiken.php?id=99" <?php if(isset($_GET['id']) && $_GET['id'] == 99) { echo "class=\"selected \""; } ?>><?php if(WW == true) { echo
+ 'WW'; } else { echo ''; }?></a>
+</div>
+<?php
+if(isset($_GET['id'])) {
+	switch($_GET['id']) {
+		case 31:
+			include("Templates/Ranking/player_attack.tpl");
+			break;
+		case 32:
+			include("Templates/Ranking/player_defend.tpl");
+			break;
+		case 7:
+			include("Templates/Ranking/player_top10.tpl");
+			break;
+		case 2:
+			include("Templates/Ranking/villages.tpl");
+			break;
+		case 3:
+			include("Templates/Ranking/milestones.tpl");
+			break;
+		case 4:
+			include("Templates/Ranking/alliance.tpl");
+			break;
+		case 8:
+			include("Templates/Ranking/heroes.tpl");
+			break;
+		case 11:
+			include("Templates/Ranking/player_1.tpl");
+			break;
+		case 12:
+			include("Templates/Ranking/player_2.tpl");
+			break;
+		case 13:
+			include("Templates/Ranking/player_3.tpl");
+			break;
+		case 16:
+			include("Templates/Ranking/player_6.tpl");
+			break;
+		case 17:
+			include("Templates/Ranking/player_7.tpl");
+			break;
+		case 18:
+			include("Templates/Ranking/player_8.tpl");
+			break;
+		case 19:
+			include("Templates/Ranking/player_9.tpl");
+			break;
+		case 41:
+			include("Templates/Ranking/alliance_attack.tpl");
+			break;
+		case 42:
+			include("Templates/Ranking/alliance_defend.tpl");
+			break;
+		case 43:
+			include("Templates/Ranking/ally_top10.tpl");
+			break;
+		case 50:
+			// Statistici grafice (Travian Plus). Sablonul isi verifica singur si
+			// flagul, si contul Plus, deci intrarea directa pe URL nu ocoleste nimic.
+			include("Templates/Ranking/statistics.tpl");
+			break;
+		case 0:
+			include("Templates/Ranking/general.tpl");
+			break;
+		case 1:
+			include("Templates/Ranking/overview.tpl");
+			break;
+		case 99:
+			include("Templates/Ranking/ww.tpl");
+			break;
+	}
+}
+else {
+	include("Templates/Ranking/overview.tpl");
+}
+?>
+ </div>
+						</td>
+					</tr>
+				</table>
+</div>
+
+<br /><br /><br /><br /><div id="side_info">
+<?php
+include("Templates/multivillage.tpl");
+include("Templates/quest.tpl");
+include("Templates/news.tpl");
+if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
+	echo "<br><br><br><br>";
+	include("Templates/links.tpl");
+}
+?>
+ </div>
+<div class="clear"></div>
+</div>
+<div class="footer-stopper"></div>
+<div class="clear"></div>
+
+<?php
+include("Templates/footer.tpl");
+include("Templates/res.tpl");
+?>
+<div id="stime">
+<div id="ltime">
+<div id="ltimeWrap">
+<?php echo CALCULATED_IN;?> <b><?php
+echo round(($generator->pageLoadTimeEnd()-$start_timer)*1000);
+?></b> ms
+
+<br /><?php echo SERVER_TIME;?> <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span>
+</div>
+	</div>
+</div>
+
+<div id="ce"></div>
+</body>
+</html>

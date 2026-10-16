@@ -1,0 +1,81 @@
+<?php
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : editAccess.tpl                                            ##
+##  Type           : Admin Panel Frontend                                      ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : Dzoki (Original)                                          ##
+##  Refactored by  : Shadow                                                    ##
+##  Redesign by    : Shadow                                                    ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2025. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+if($_SESSION['access'] < ADMIN) die("Access Denied: You are not Admin!");
+$id = (int) $_SESSION['id'];
+if(isset($_GET['uid']))
+{
+	$sql = mysqli_query($GLOBALS["link"], "SELECT access FROM ".TB_PREFIX."users WHERE id = ".(int) $_GET['uid']."");
+	$curaccess = mysqli_result($sql, 0);
+	$player = mysqli_fetch_assoc(mysqli_query($GLOBALS["link"], "SELECT * FROM ".TB_PREFIX."users WHERE id = ".$id.""));
+	?>
+
+	<form action="../GameEngine/Admin/Mods/editAccess.php" method="POST">
+		<?php echo csrf_field(); ?>
+		<input type="hidden" name="admid" id="admid" value="<?php echo $_SESSION['id']; ?>">
+		<input type="hidden" name="uid" id="uid" value="<?php echo (int)($_GET['uid'] ?? 0); ?>">
+		<table id="member" style="width:300px;">
+			<thead>
+				<tr>
+					<th colspan="2">Edit <?php echo htmlspecialchars($player['username']); ?>'s access</th>
+				</tr>
+				<tr>
+					<td></td>
+					<td></td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>
+						<center>
+							<b><?php echo ADM_CHANGE_ACCESS; ?></b>
+						</center>
+					</td>
+					<td>
+						<center>
+							<select name="access" class="dropdown">
+								<option value="0" <?php if($curaccess == 0) { echo 'selected="selected"'; } else { echo ''; } ?>><?php echo ADM_BANNED; ?></option>
+								<option value="2" <?php if($curaccess == 2) { echo 'selected="selected"'; } else { echo ''; } ?>><?php echo ADM_NORMAL_USER; ?></option>
+								<option value="8" <?php if($curaccess == 8) { echo 'selected="selected"'; } else { echo ''; } ?>><?php echo ADM_MULTIHUNTER; ?></option>
+								<option value="9" <?php if($curaccess == 9) { echo 'selected="selected"'; } else { echo ''; } ?>><?php echo ADMIN_ADMIN; ?></option>
+							</select>
+						</center>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<center>
+							<input type="image" src="../img/admin/b/ok1.gif" value="submit" title="<?php echo ADM_GIVE_PLAYERS_FREE_GOLD; ?>">
+						</center>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</form><?php
+	if(isset($_GET['g']))
+	{
+		echo '<br /><br /><font color="Red"><b>Players Access Changed</font></b>';
+	}
+}
+else
+{
+	include("404.tpl");
+}
+?>

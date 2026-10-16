@@ -1,0 +1,459 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : build.php                      	                       ##
+##  Type           : In Game Build Page                                        ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : yi12345					                               ##
+##  Refactored by  : Shadow                                                    ##
+##  Redesign by    : Shadow                                                    ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  URLs:          : https://travianz.org                                      ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+use App\Utils\AccessLogger;
+
+ob_start();
+include_once( "GameEngine/Village.php" );
+include_once( "GameEngine/Units.php" );
+AccessLogger::logRequest();
+
+/**
+ * $route e setat doar in unele ramuri de mai jos, dar linia
+ * "if(... || $route == 1 || ...)" din zona de afisare il citeste mereu.
+ * Il initializam aici, o singura data, ca sa nu mai iasa
+ * "Undefined variable $route" pe fiecare deschidere de cladire.
+ */
+$route = 0;
+
+if(isset($_GET['newdid'])){
+    $_SESSION['wid'] = $_GET['newdid'];
+
+    /**
+     * Redirectul pastra doar id/gid, deci un link de forma
+     * "build.php?newdid=X&gid=37&t4tab=adventures" (folosit de componenta
+     * Hero din bara de sus, cand eroul e in alt sat decat cel privit)
+     * ajungea pe tab-ul implicit al Resedintei Eroului, nu pe Aventuri.
+     * Pastram acum si t4tab (lista alba) si parametrul "land" al oazelor.
+     *
+     * Bonus: id/gid trec prin acelasi filtru ca mai jos inainte sa intre in
+     * antetul Location - inainte se concatena valoarea bruta din $_GET.
+     */
+    $tzRedirect = '';
+
+    if (isset($_GET['id'])) {
+        $tzRedirect = '?id=' . preg_replace("/[^a-zA-Z0-9_-]/", "", $_GET['id']);
+    } else if (isset($_GET['gid'])) {
+        $tzRedirect = '?gid=' . preg_replace("/[^a-zA-Z0-9_-]/", "", $_GET['gid']);
+    }
+
+    if ($tzRedirect !== '') {
+
+        if (isset($_GET['t4tab']) && in_array($_GET['t4tab'], ['items', 'adventures', 'auction'], true)) {
+            $tzRedirect .= '&t4tab=' . $_GET['t4tab'];
+        } else if (isset($_GET['land'])) {
+            $tzRedirect .= '&land';
+        }
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF'] . $tzRedirect);
+    exit;
+}
+if(isset($_GET['id']) && ($_GET['id'] < 1 || $_GET['id'] > 40 && ($_GET['id'] == 99 && $village->natar == 0 || $_GET['id'] != 99))){
+    header("Location: dorf2.php");
+    exit;
+}
+
+$pagestart = $generator->pageLoadTimeStart();
+$alliance->procAlliForm($_POST);
+$technology->procTech($_POST);
+$market->procMarket($_POST);
+
+if ( isset( $_GET['gid'] ) ) {
+    $_GET['id'] = strval( $building->getTypeField( preg_replace( "/[^a-zA-Z0-9_-]/", "", $_GET['gid'] ) ) );
+} else if ( isset( $_POST['id'] ) ) {
+    $_GET['id'] = preg_replace( "/[^a-zA-Z0-9_-]/", "", $_POST['id'] ); // WTF is this?
+}
+
+if ( isset( $_POST['t'] ) ) {
+    $_GET['t'] = preg_replace( "/[^a-zA-Z0-9_-]/", "", $_POST['t'] );
+}
+
+if ( isset( $_GET['id'] ) ) {
+    if ( ! ctype_digit( preg_replace( "/[^a-zA-Z0-9_-]/", "", $_GET['id'] ) ) ) {
+        $_GET['id'] = "1";
+    }
+
+    $checkBuildings = [0, 16, 17, 25, 26, 27];
+
+    if ( $_GET['id'] < 19 || ( isset( $_GET['gid'] ) && ! in_array( $_GET['gid'], $checkBuildings ) ) ) {
+        $_GET['t'] = "";
+        $_GET['s'] = "";
+    }
+
+    if ( $village->resarray[ 'f' . $_GET['id'] . 't' ] == 17 ) {
+        $market->procRemove( $_GET );
+    }
+
+    if ( $village->resarray[ 'f' . $_GET['id'] . 't' ] == 18 ) {
+        $alliance->procAlliance( $_GET );
+    }
+
+    if ( $village->resarray[ 'f' . $_GET['id'] . 't' ] == 12 || $village->resarray[ 'f' . $_GET['id'] . 't' ] == 13 || $village->resarray[ 'f' . $_GET['id'] . 't' ] == 22 ) {
+        $technology->procTechno( $_GET );
+    }
+}
+
+if ($session->goldclub == 1 && count($session->villages) > 1) {
+    if (isset($_POST['routeid'])) $routeid = $_POST['routeid'];
+
+    /**
+     * PERMISIUNI SITTER: rutele comerciale costa 2 aur (creare si prelungire).
+     * Gardul e aici, inaintea ambelor actiuni, nu in fiecare ramura.
+     */
+    $sitterGoldBlocked = (isset($session) && method_exists($session, 'sitterCan')
+        && !$session->sitterCan(SITTER_PERM_GOLD));
+
+    if (isset($_POST['action']) && $_POST['action'] == 'addRoute') {
+        if ($session->gold >= 2 && $session->goldclub == 1 && !$sitterGoldBlocked) {
+            for ($i = 1; $i <= 4; $i ++) {
+                if (empty($_POST['r'.$i])) $_POST['r'.$i] = 0;
+            }
+            
+            $totalres = preg_replace("/[^0-9]/", "", $_POST['r1']) + preg_replace("/[^0-9]/", "", $_POST['r2']) + preg_replace("/[^0-9]/", "", $_POST['r3']) + preg_replace("/[^0-9]/", "", $_POST['r4']);
+            $reqMerc  = ceil(($totalres - 0.1) / $market->maxcarry);
+            $second   = date("s");
+            $minute   = date("i");
+            $hour     = date("G") - $_POST['start'];
+            
+            if (date("G") > $_POST['start']) $day = 1;
+            else $day = 0;
+            
+            $timestamp = strtotime("-$hour hours -$second second -$minute minutes +$day day");
+            
+            if ($totalres > 0 && $_POST['tvillage'] != $village->wid && in_array($_POST['tvillage'], $session->villages) && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
+                $database->createTradeRoute($session->uid, $_POST['tvillage'], $village->wid, $_POST['r1'], $_POST['r2'], $_POST['r3'], $_POST['r4'], $_POST['start'], $_POST['deliveries'], $reqMerc, $timestamp);
+                $route = 1;
+                header("Location: build.php?gid=17&t=4");
+                exit;
+            } else {
+                $route = 1;
+                header("Location: build.php?gid=17&t=4&create");
+                exit;
+            }
+        }
+    }
+
+    if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'extendRoute') {
+        if ($session->gold >= 2 && $session->goldclub == 1 && !$sitterGoldBlocked) {
+            $traderoute = $database->getTradeRouteUid($_POST['routeid']);
+            if ($traderoute == $session->uid) {
+                /**
+                 * spendGold() scade relativ si atomic, apoi invalideaza singur
+                 * cache-ul de sesiune. Inainte se scria absolut pornind de la
+                 * $session->gold, care putea fi vechi de 30 de secunde - exact
+                 * riscul de dubla cheltuire semnalat in comentariul de aici.
+                 * Prelungirea se face DOAR daca plata a reusit.
+                 */
+                if ($database->spendGold($session->uid, 2, 'Extend trade route')) {
+                    $database->editTradeRoute($_POST['routeid'], "timeleft", 604800, 1);
+                    $session->gold -= 2;
+                }
+            }
+        }
+        $route = 1;
+        unset($routeid);
+        header("Location: build.php?gid=17&t=4");
+        exit;
+    }
+
+    if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'editRoute2') {
+        if($session->goldclub == 1){
+            for ($i = 1; $i <= 4; $i ++) {
+                if (empty($_POST['r'.$i])) {
+                    $_POST['r'.$i] = 0;
+                }
+            }
+            $totalres = preg_replace("/[^0-9]/", "", $_POST['r1']) + preg_replace("/[^0-9]/", "", $_POST['r2']) + preg_replace("/[^0-9]/", "", $_POST['r3']) + preg_replace("/[^0-9]/", "", $_POST['r4']);
+            $reqMerc  = ceil(($totalres - 0.1) / $market->maxcarry);
+            
+            $traderoute = $database->getTradeRouteUid($_POST['routeid']);
+            if ($totalres > 0 && $traderoute == $session->uid && ($_POST['start'] >= 0 && $_POST['start'] <= 23) && ($_POST['deliveries'] >= 1 && $_POST['deliveries'] <= 3)) {
+                $database->editTradeRoute($_POST['routeid'], "wood", $_POST['r1'], 0);
+                $database->editTradeRoute($_POST['routeid'], "clay", $_POST['r2'], 0);
+                $database->editTradeRoute($_POST['routeid'], "iron", $_POST['r3'], 0);
+                $database->editTradeRoute($_POST['routeid'], "crop", $_POST['r4'], 0);
+                $database->editTradeRoute($_POST['routeid'], "start", $_POST['start'], 0);
+                $database->editTradeRoute($_POST['routeid'], "deliveries", $_POST['deliveries'], 0);
+                $database->editTradeRoute($_POST['routeid'], "merchant", $reqMerc, 0);
+                $second = date("s");
+                $minute = date("i");
+                $hour   = date("G") - $_POST['start'];
+                if (date("G") > $_POST['start'])  $day = 1;
+                else $day = 0;
+                $timestamp = strtotime("-$hour hours -$second seconds -$minute minutes +$day day");
+                $database->editTradeRoute($_POST['routeid'], "timestamp", $timestamp, 0);
+            }
+            
+            $route = 1;
+            unset($routeid);
+            header("Location: build.php?gid=17&t=4");
+            exit;
+        } 
+    }
+
+    if (isset($_POST['routeid']) && isset($_POST['action']) && $_POST['action'] == 'delRoute') {
+        if($session->goldclub == 1){
+            $traderoute = $database->getTradeRouteUid($_POST['routeid']);
+            if ($traderoute == $session->uid) $database->deleteTradeRoute($_POST['routeid']);
+            $route = 1;
+            unset($routeid);
+            header("Location: build.php?gid=17&t=4");
+            exit;
+        }
+    }
+}
+
+// FIX (PHP log): $create trebuie sa fie mereu definit inainte de
+// farmlist.tpl (if($create==1)/elseif==2/elseif==3), altfel "Undefined
+// variable $create" x3. Vechiul cod il seta doar in interiorul blocului
+// de mai jos, dar cand $_GET['action'] e setat la o valoare care nu
+// se potriveste cu niciunul dintre cele 3 cazuri (ex. action=showSlot
+// fara eid, sau eid=0) nu exista niciun "else" care sa-l initializeze.
+// Default sigur, suprascris mai jos daca vreunul din cazuri se potriveste.
+$create = 0;
+
+/**
+ * ANOMALIE SEMNALATA (neatinsa - nu face parte din erorile din log):
+ * "isset($_GET['t']) == 99" nu compara valoarea lui t cu 99, ci
+ * compara boolean-ul isset() (true/false) cu intreg-ul 99. In PHP,
+ * 99 se converteste la bool(true) in comparatie, deci conditia e
+ * adevarata pentru ORICE valoare a lui $_GET['t'] cat timp e setat
+ * (nu doar t=99), si falsa doar cand t lipseste complet. Probabil
+ * intentia a fost "$_GET['t'] == 99". Las neschimbat - decizi tu daca
+ * vrei sa restrangi blocul doar la t=99 real.
+ */
+if ($session->goldclub == 1) {
+    if (isset($_GET['t']) == 99) {
+        if(isset($_GET['action'])){
+            if($_GET['action'] == 'addList') $create = 1;
+            elseif($_GET['action'] == 'addraid') $create = 2;
+            elseif($_GET['action'] == 'showSlot' && $_GET['eid']) $create = 3; 
+        }       
+        else $create = 0;
+
+        if(isset($_GET['slid']) && $_GET['slid']){
+            $FLData = $database->getFLData($_GET['slid']);
+            if ($FLData['owner'] == $session->uid) $checked[$_GET['slid']] = 1;
+        }
+
+        if(isset($_GET['action']) && $_GET['action'] == 'deleteList') {
+            $database->delFarmList($_GET['lid'], $session->uid);
+            header("Location: build.php?id=39&t=99");
+            exit;
+        } elseif(isset($_GET['action']) && $_GET['action'] == 'deleteSlot') {
+            $database->delSlotFarm($_GET['eid'], $session->uid, $_GET['lid']);
+            header("Location: build.php?id=39&t=99");
+            exit;
+        }
+
+        if(isset($_POST['action']) && $_POST['action'] == 'startRaid') $units->startRaidList($_POST);
+
+        if(isset($_GET['slid']) && is_numeric($_GET['slid'])) {
+            $FLData = $database->getFLData($_GET['slid']);
+            if ($FLData['owner'] == $session->uid) $checked[$_GET['slid']] = 1;
+        }
+
+        if(isset($_GET['evasion']) && is_numeric($_GET['evasion'])) {
+            $evasionvillage = $database->getVillage($_GET['evasion']);
+            if($evasionvillage['owner'] == $session->uid) $database->setVillageEvasion($_GET['evasion']);
+            
+            header("Location: build.php?id=39&t=99");
+            exit;
+        }
+
+        if (isset($_POST['maxevasion']) && is_numeric($_POST['maxevasion'])) {
+            $database->updateUserField($session->uid, "maxevasion", $_POST['maxevasion'], 1);
+            header("Location: build.php?id=39&t=99" );
+            exit;
+        }
+    }
+}
+else $create = 0;
+
+if(isset($_POST['a']) == 533374 && isset($_POST['id']) == 39) $units->Settlers($_POST);
+
+/**
+ * Anularea unei miscari din rally point (linkul "x" din 16_walking.tpl).
+ *
+ * EXPLOIT REPARAT (duplicare de trupe): varianta veche verifica intai
+ * "SELECT Count(*) ... where proc = 0 and moveid = X", apoi facea UPDATE proc = 1
+ * si abia apoi addMovement(4, ..., ref-ul miscarii anulate). Intre COUNT si UPDATE
+ * exista o fereastra TOCTOU: doua request-uri trimise simultan treceau amandoua de
+ * COUNT si inserau DOUA movement-uri de retur cu ACELASI ref. Cron-ul livreaza
+ * trupele o data pentru fiecare rand de movement, deci un ciclu trimite-anuleaza
+ * dubla trupele. Repetat de cateva ori: 30k -> 60k -> 120k -> 242k -> ... -> milioane.
+ *
+ * Acum revendicarea se face intr-un singur UPDATE conditionat, in
+ * $database->claimMovementCancel(), care verifica atomic: proc = 0, expeditorul e
+ * satul curent, sort_type IN (3, 5) si fereastra de 90 de secunde. Returul se
+ * creeaza doar daca ACEST request a fost cel care a schimbat randul.
+ *
+ * Doua lucruri semnalate, nu schimbate tacit:
+ *  - $q2 ("SELECT id FROM send ORDER BY id DESC") si $lastid erau cod mort:
+ *    rezultatul nu era folosit nicaieri. Eliminat.
+ *  - $_GET['id'] intra brut in antetul Location. Trecut acum prin (int),
+ *    ca in restul fisierului.
+ */
+if(isset($_GET['mode']) && $_GET['mode'] == 'troops' && isset($_GET['cancel']) && $_GET['cancel'] == 1){
+    $moveid = isset($_GET['moveid']) && is_numeric($_GET['moveid']) ? (int) $_GET['moveid'] : 0;
+
+    if($moveid > 0 && $database->claimMovementCancel($moveid, $village->wid)){
+        $oldmovement = $database->getMovementById($moveid);
+
+        if(!empty($oldmovement)){
+            $now = time();
+            $end = $now + ($now - (int) $oldmovement[0]['starttime']);
+            $database->addMovement(4, (int) $oldmovement[0]['to'], (int) $oldmovement[0]['from'], (int) $oldmovement[0]['ref'], $now, $end);
+        }
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . (isset($_GET['id']) ? (int) $_GET['id'] : 39));
+    exit();
+}
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<title><?php echo SERVER_NAME; ?></title>
+	<link rel="shortcut icon" href="favicon.ico"/>
+	<meta http-equiv="cache-control" content="max-age=0" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<meta http-equiv="imagetoolbar" content="no" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+	<script src="mt-full.js?ebe79" type="text/javascript"></script>
+	<script src="unx.js?f4b7h" type="text/javascript"></script>
+	<script src="new.js?ebe79" type="text/javascript"></script>
+	<link href="<?php echo GP_LOCATE; ?>lang/en/lang.css?f4b7d" rel="stylesheet" type="text/css" />
+	<link href="<?php echo GP_LOCATE; ?>lang/en/compact.css?f4b7i" rel="stylesheet" type="text/css" />
+	<?php
+	// GP_LOCATE contine deja pachetul efectiv: alegerea jucatorului cand
+	// e permisa si valida, altfel pachetul serverului (vezi config.php).
+	echo "
+		<link href='".GP_LOCATE."travian.css?e21d2' rel='stylesheet' type='text/css' />
+		<link href='".GP_LOCATE."lang/en/lang.css?e21d2' rel='stylesheet' type='text/css' />";
+	?>
+	<script type="text/javascript">
+
+		window.addEvent('domready', start);
+	</script>
+</head>
+
+
+<body class="v35 ie ie8">
+<div class="wrapper">
+<img style="filter:chroma();" src="img/x.gif" id="msfilter" alt="" />
+<div id="dynamic_header">
+	</div>
+<?php include("Templates/header.tpl"); ?>
+<div id="mid">
+<?php include("Templates/menu.tpl"); ?>
+<div id="content"  class="build">
+<?php
+if(isset($_GET['id']) || isset($_GET['gid']) || $route == 1 || isset($_POST['routeid']) || isset($_GET['buildingFinish'])) {
+    
+    if(isset($_GET['s']) && !ctype_digit($_GET['s'])) $_GET['s'] = null;
+    if(isset($_GET['t']) && !ctype_digit($_GET['t'])) $_GET['t'] = null;
+	if (!ctype_digit($_GET['id'])) $_GET['id'] = 1;
+
+	$id = $_GET['id'];
+	if($_GET['id'] == 99 && $village->resarray['f99t'] == 40){
+	   include("Templates/Build/ww.tpl");
+	} elseif($village->resarray['f'.$_GET['id'].'t'] == 0 && $_GET['id'] >= 19) {
+		include("Templates/Build/avaliable.tpl");
+	}
+	else {
+		if(isset($_GET['t'])) {
+		    if($_GET['t'] == 1) $_SESSION['loadMarket'] = 1;
+			// FIX (PHP log): pentru un tab (t) care nu exista pentru cladirea
+			// curenta (ex. link vechi/stale catre gid=19 cu t=3, care nu are
+			// niciun ..._3.tpl), include() arunca Warning "Failed to open
+			// stream" de doua ori (o data la include, o data la eroarea de
+			// deschidere). Verificam intai ca fisierul tinta chiar exista.
+			$buildTabFile = "Templates/Build/".$village->resarray['f'.$_GET['id'].'t']."_".$_GET['t'].".tpl";
+			if (file_exists($buildTabFile)) include($buildTabFile);
+		} elseif(isset($_GET['s'])) {
+			$buildTabFile = "Templates/Build/".$village->resarray['f'.$_GET['id'].'t']."_".$_GET['s'].".tpl";
+			if (file_exists($buildTabFile)) include($buildTabFile);
+		}
+		else include("Templates/Build/".$village->resarray['f'.$_GET['id'].'t'].".tpl");
+		
+		if((isset($_GET['buildingFinish'])) && $_GET['buildingFinish'] == 1) {
+        	if($session->gold >= 2) {
+        		$building->finishAll("build.php?gid=".$_GET['id']."&ty=".$_GET['ty']);
+        		exit;
+        	}
+        }
+	}
+}else{
+header("Location: ".$_SERVER['PHP_SELF']."?id=39");
+exit;
+}
+?>
+
+</div>
+
+<br /><br /><br /><br /><div id="side_info">
+<?php
+include("Templates/multivillage.tpl");
+include("Templates/quest.tpl");
+include("Templates/news.tpl");
+if(!NEW_FUNCTIONS_DISPLAY_LINKS) {
+	echo "<br><br><br><br>";
+	include("Templates/links.tpl");
+}
+?>
+</div>
+<div class="clear"></div>
+
+<div class="footer-stopper"></div>
+<div class="clear"></div>
+
+<?php
+include("Templates/footer.tpl");
+include("Templates/res.tpl");
+?>
+<div id="stime">
+<div id="ltime">
+<div id="ltimeWrap">
+<?php echo CALCULATED_IN;?> <b><?php
+echo round(($generator->pageLoadTimeEnd()-$pagestart)*1000);
+?></b> ms
+
+<br />Server time: <span id="tp1" class="b"><?php echo date('H:i:s'); ?></span>
+</div>
+	</div>
+</div>
+
+<div id="ce">    </div>
+<script type="text/javascript">
+	// update TITLE to include building name, as it's not very possible to do in PHP in current codebase
+	if (document.getElementsByTagName('h1').length) {
+		document.title = document.title + ' » » ' + document.getElementsByTagName('h1')[0].innerHTML.replace(/(<([^>]+)>)/ig,"");
+	} 
+	else document.title + ' » » New Building'
+</script>
+</body>
+</html>

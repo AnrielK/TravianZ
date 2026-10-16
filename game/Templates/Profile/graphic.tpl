@@ -1,0 +1,260 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Project:       TravianZ      					       		 		  	   ##
+##  Version:       06.05.2026 						       	 				   ##
+##  Filename       graphic.tpl                                                 ##
+##  Refactored by  Shadow					                                   ##
+##  License:       TravianZ Project                                            ##
+##  Copyright:     TravianZ (c) 2010-2026. All rights reserved.                ##
+##  URLs:          http://travianz.org						       	 		   ##
+##  Source code:   http://github.com/Shadowss/TravianZ/         	       	   ##
+##                                                                             ##
+#################################################################################
+
+if (GP_ENABLE) {
+?>
+
+<h1><?php echo PLAYER_PROFILE; ?></h1>
+
+<?php
+// =========================
+// MENU INCLUDE (IMPORTANT)
+// =========================
+include("menu.tpl");
+
+// =========================
+// SAVE CUSTOM GPACK (POST)
+// =========================
+if (isset($_POST["custom_url"])) {
+
+    // păstrăm compatibilitatea cu sistemul vechi
+    $database->updateUserField(
+        $session->uid,
+        "gpack",
+        $_POST["custom_url"],
+        1
+    );
+}
+
+// =========================
+// PREVIEW GPACK (GET)
+// =========================
+if (isset($_GET["custom_url"])) {
+
+    // NU schimbăm logica, doar securizăm output
+    $gpackUrl = $_GET["custom_url"];
+    $gpackUrlEsc = htmlspecialchars($gpackUrl, ENT_QUOTES, 'UTF-8');
+?>
+
+<link href="<?php echo $gpackUrlEsc; ?>lang/en/gp_check.css" rel="stylesheet" type="text/css">
+
+<div id="gpack_popup">
+
+    <!-- ================= ERROR BOX ================= -->
+    <div id="gpack_error">
+        <img class="logo unknown" src="img/x.gif" alt="<?php echo TZ_UNKNOWN; ?>" title="<?php echo TZ_UNKNOWN; ?>">
+
+        <span class="error">
+            <?php echo TZ_ML_GPACK_NOTFOUND; ?>
+        </span>
+
+        <br>
+
+        <ul>
+            <li>
+                The path must be set to the folder that contains the file
+                '<b>travian.css</b>' and the folders '<b>img</b>', '<b>lang</b>' and '<b>modules</b>'.
+            </li>
+            <li>
+                Your browser does not support Graphic Packs hosted on your computer and needs them online,
+                starting with '<b>http://</b>'.
+            </li>
+        </ul>
+
+        <form action="spieler.php" method="post">
+            <input type="hidden" name="s" value="4">
+            <div class="btn">
+                <button class="trav_buttons" id="btn_ok"><?php echo TZ_OK_2; ?></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ================= SUCCESS BOX ================= -->
+    <div id="gpack_activate">
+
+        <span class="info"><?php echo TZ_GRAPHIC_PACK_FOUND; ?></span><br>
+
+        <img id="preview" src="img/x.gif"><br>
+
+        <?php echo TZ_THE_PATH; ?>
+        <span class="path"><?php echo $gpackUrlEsc; ?></span>
+        <?php echo TZ_ML_GPACK_ALLOWED_SAVE; ?>
+
+        <form action="spieler.php" method="post">
+            <input type="hidden" name="s" value="4">
+            <input type="hidden" name="custom_url" value="<?php echo $gpackUrlEsc; ?>">
+
+            <div class="btn">
+                <button class="trav_buttons" id="btn_save" name="gp_activate_button">
+                    Save
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+
+<?php } ?>
+
+<!-- ========================= FORM GP SETTINGS ========================= -->
+
+<form action="spieler.php" method="post" name="gp_selection">
+    <input type="hidden" name="s" value="4" />
+
+    <table cellpadding="1" cellspacing="1" id="gpack">
+
+        <thead>
+            <tr>
+                <th><?php echo TZ_GRAPHIC_PACK_SETTINGS; ?></th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            <tr>
+                <td class="info">
+                    <?php echo TZ_ML_GPACK_ALTER_APPEARANCE; ?>
+                    <br><br>
+                    <span class="alert"><?php echo TZ_ATTENTION_USE_ONLY_TRUSTWORTHY_GRA; ?></span>
+                </td>
+            </tr>
+
+            <tr>
+                <th class="empty"></th>
+            </tr>
+
+            <tr>
+                <td>
+
+                    <label>
+                        <input type="radio" class="radio" name="gp_type" value="custom" checked="checked" />
+                        <?php echo TZ_USER_DEFINED_GRAPHIC_PACK; ?>
+                    </label>
+
+                    <input
+                        class="text"
+                        type="text"
+                        name="custom_url"
+                        value="<?php echo $session->gpack; ?>"
+                        onclick="document.gp_selection.gp_type[1].checked = true"
+                    />
+
+                    <br />
+
+                    <div class="example">
+                        <?php echo TZ_EXAMPLE; ?>
+                        <span class="path">file:///C:/Travian/gpack/</span>
+                        or
+                        <span class="path">http://www.travian.org/user/gpack/</span>
+                    </div>
+
+                    <center>
+                        <div class="example">
+                            <?php echo TZ_DEFAULT; ?>
+                            <span class="path"><?php echo GP_LOCATE; ?></span>
+                        </div>
+                    </center>
+
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    <p class="btn">
+        <button name="gp_selection_button" value="ok" class="trav_buttons" id="btn_ok">
+            <?php echo TZ_OK_2; ?>
+        </button>
+    </p>
+</form>
+
+<!-- ========================= AVAILABLE PACKS ========================= -->
+
+<table cellpadding="1" cellspacing="1" id="download">
+
+    <thead>
+        <tr>
+            <th colspan="4"><?php echo TZ_MORE_GRAPHIC_PACKS; ?></th>
+        </tr>
+        <tr>
+            <td><?php echo NAME; ?></td>
+            <td><?php echo TZ_SIZE_IN_MB; ?></td>
+            <td><?php echo ACTIVATE; ?></td>
+            <td><?php echo TZ_DOWNLOAD; ?></td>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <?php
+            // Lista pachetelor disponibile, citita din gpack/ - inainte erau doua
+            // intrari scrise de mana, deci orice pachet adaugat pe server nu
+            // aparea aici. Un director conteaza ca pachet daca are travian.css.
+            $gpHelper = __DIR__ . '/../../GameEngine/Admin/Mods/config_template.php';
+
+            if (!function_exists('tz_available_gpacks') && is_file($gpHelper)) {
+                include_once($gpHelper);
+            }
+
+            $gpPacks = function_exists('tz_available_gpacks')
+                ? tz_available_gpacks(__DIR__ . '/../../gpack')
+                : array('gpack/travian_default/' => 'Travian Default');
+
+            // Pachetul marcat ca activ e cel EFECTIV folosit acum. Cand
+            // GP_ENABLE e false, alegerea din baza de date e ignorata de joc,
+            // deci ar fi inselator sa aratam altceva decat pachetul serverului.
+            $gpActive = (defined('GP_ENABLE') && GP_ENABLE && $session->gpack)
+                ? rtrim((string) $session->gpack, '/') . '/'
+                : (defined('SERVER_GP') ? SERVER_GP : GP_LOCATE);
+
+            foreach ($gpPacks as $gpPath => $gpLabel) {
+                $gpIsActive = (rtrim($gpPath, '/') . '/') === $gpActive;
+                $gpZip      = 'gpack/download/' . basename(rtrim($gpPath, '/')) . '.zip';
+        ?>
+        <tr>
+            <td class="nam"><?php echo htmlspecialchars($gpLabel, ENT_QUOTES, 'UTF-8'); ?></td>
+            <td class="size">4</td>
+            <td class="act">
+                <?php if ($gpIsActive) { ?>
+                    <b><?php echo defined('TZ_ACTIVE') ? TZ_ACTIVE : 'Active'; ?></b>
+                <?php } else { ?>
+                    <a href="spieler.php?s=4&amp;gp_type=custom&amp;custom_url=<?php echo urlencode($gpPath); ?>">
+                        <?php echo defined('ACTIVATE') ? ACTIVATE : 'Activate'; ?>
+                    </a>
+                <?php } ?>
+            </td>
+            <td class="down">
+                <?php if (is_file(__DIR__ . '/../../' . $gpZip)) { ?>
+                    <a href="<?php echo $gpZip; ?>" target="_blank"><?php echo TZ_DOWNLOAD; ?></a>
+                <?php } else { ?>
+                    &ndash;
+                <?php } ?>
+            </td>
+        </tr>
+        <?php } ?>
+
+    </tbody>
+
+</table>
+
+<?php
+} else {
+    // fallback dacă GP_ENABLE este dezactivat
+    header("Location: " . $_SERVER['PHP_SELF'] . "?uid=" . $session->uid);
+    exit;
+}
+?>

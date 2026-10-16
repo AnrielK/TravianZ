@@ -1,0 +1,8 @@
+<h1><img class="unit ugeb" src="img/x.gif"> <?php echo PALACE; ?></h1><img class="building g26" src="img/x.gif" alt="<?php echo PALACE; ?>" title="<?php echo PALACE; ?>" /><?php echo MANUAL_DESC_PALACE; ?><p><b><?php echo COSTS; ?></b> <?php echo constant('AND'); ?> <b><?php echo CONSTRUCTION_TIME; ?></b> <?php echo MANUAL_FOR_LEVEL_1; ?><br /><img class="r1" src="img/x.gif" alt="<?php echo LUMBER; ?>" title="<?php echo LUMBER; ?>" />550 | <img class="r2" src="img/x.gif" alt="<?php echo CLAY; ?>" title="<?php echo CLAY; ?>" />800 | <img class="r3" src="img/x.gif" alt="<?php echo IRON; ?>" title="<?php echo IRON; ?>" />750 | <img class="r4" src="img/x.gif" alt="<?php echo CROP; ?>" title="<?php echo CROP; ?>" />250 | <img class="r5" src="img/x.gif" alt="<?php echo CROP_CONSUMPTION; ?>" title="<?php echo CROP_CONSUMPTION; ?>" />1 | <span class="dur"><img class="clock" alt="<?php echo DURATION; ?>" title="<?php echo DURATION; ?>" src="img/x.gif" />1:23:20</span></p>
+	<p><b><?php echo PREREQUISITES; ?></b><br /><a href="manual.php?typ=4&gid=18"><?php echo EMBASSY; ?></a> <?php echo LEVEL; ?> 1, <a href="manual.php?typ=4&gid=15"><?php echo MAINBUILDING; ?></a> <?php echo LEVEL; ?> 5, <a href="manual.php?typ=4&gid=25"><strike><?php echo RESIDENCE; ?></strike></a></p>
+<map id="nav" name="nav">
+    <area href="manual.php?typ=4&amp;gid=25" title="<?php echo BACK; ?>" coords="0,0,45,18" shape="rect" alt="" />
+    <area href="manual.php?s=1" title="<?php echo OVERVIEW; ?>" coords="46,0,70,18" shape="rect" alt="" />
+    <area href="manual.php?typ=4&amp;gid=27" title="<?php echo FORWARD; ?>" coords="71,0,116,18" shape="rect" alt="" />
+</map>
+<img usemap="#nav" src="img/x.gif" class="navi" alt="" />

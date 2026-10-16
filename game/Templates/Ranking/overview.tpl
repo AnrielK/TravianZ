@@ -1,0 +1,204 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Project:       TravianZ      					       		 		  	   ##
+##  Version:       01.09.2013 						       	 				   ##
+##  Filename       overview.tpl                                                ##
+##  Refactored by  Shadow					                                   ##
+##  License:       TravianZ Project                                            ##
+##  Copyright:     TravianZ (c) 2010-2013. All rights reserved.                ##
+##  URLs:          http://travian.shadowss.ro 				       	 		   ##
+##  Source code:   http://github.com/Shadowss/TravianZ/         	       	   ##
+##                                                                             ##
+#################################################################################
+
+$search = 0;
+
+// ------------------------- SEARCH VALIDATION -------------------------
+if (!isset($_SESSION['search']) || !is_numeric($_SESSION['search'])) {
+?>
+    <center>
+        <font color="orange" size="2">
+            <p class="error">
+                <?php echo TZ_THE_USER; ?> <b>"<?php echo htmlspecialchars($_SESSION['search'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"</b> <?php echo TZ_DOES_NOT_EXIST; ?>
+            </p>
+        </font>
+    </center>
+<?php
+    $search = 0;
+} else {
+    $search = (int)$_SESSION['search'];
+}
+?>
+
+<table cellpadding="1" cellspacing="1" id="player">
+    <thead>
+        <tr>
+            <th colspan="5">
+                <?php echo TZ_THE_LARGEST_PLAYERS; ?>
+
+                <div id="submenu">
+                    <?php
+                        // Tabul de statistici grafice: apare doar cand functia e
+                        // pornita SI jucatorul are Plus activ.
+                        //
+                        // Iconita foloseste acelasi tipar ca vecinele ei: un
+                        // img gol (img/x.gif) cu imaginea pusa din CSS prin
+                        // clasa. Sprite-ul e la gpack/<pachet>/img/s/stats.gif,
+                        // 30x63, cu starea normala sus si cea activa jos.
+                        if (defined('NEW_FUNCTIONS_PLUS_STATISTICS') && NEW_FUNCTIONS_PLUS_STATISTICS
+                            && isset($session->plus) && (int) $session->plus == 1) {
+                            $psLabel = defined('PLUSSTATS_TITLE') ? PLUSSTATS_TITLE : 'Graphical statistics';
+                            $psLabel = htmlspecialchars($psLabel, ENT_QUOTES, 'UTF-8');
+                            echo '<a title="' . $psLabel . '" href="statistiken.php?id=50">'
+                               . '<img class="btn_stats" src="img/x.gif" alt="' . $psLabel . '" />'
+                               . '</a>';
+                        }
+                    ?>
+                    <a title="<?php echo TZ_TOP_10; ?>" href="statistiken.php?id=7">
+                        <img class="btn_top10" src="img/x.gif" alt="<?php echo TZ_TOP_10; ?>" />
+                    </a>
+                    <a title="<?php echo DEFENDER; ?>" href="statistiken.php?id=32">
+                        <img class="btn_def" src="img/x.gif" alt="<?php echo DEFENDER; ?>" />
+                    </a>
+                    <a title="<?php echo ATTACKER; ?>" href="statistiken.php?id=31">
+                        <img class="btn_off" src="img/x.gif" alt="<?php echo ATTACKER; ?>" />
+                    </a>
+                </div>
+
+                <br>
+
+                <div id="submenu2">
+                    <a title="<?php echo TRIBE1; ?>" href="statistiken.php?id=11">
+                        <img class="btn_v1" src="img/x.gif" alt="<?php echo TRIBE1; ?>">
+                    </a>
+                    <a title="<?php echo TRIBE2; ?>" href="statistiken.php?id=12">
+                        <img class="btn_v2" src="img/x.gif" alt="<?php echo TRIBE2; ?>">
+                    </a>
+                    <a title="<?php echo TRIBE3; ?>" href="statistiken.php?id=13">
+                        <img class="btn_v3" src="img/x.gif" alt="<?php echo TRIBE3; ?>">
+                    </a>
+                    <?php if (defined('NEW_FUNCTION_TRIBE_HUNS') && NEW_FUNCTION_TRIBE_HUNS): ?>
+                    <a title="<?php echo TRIBE6; ?>" href="statistiken.php?id=16">
+                        <img class="btn_v6" src="img/x.gif" alt="<?php echo TRIBE6; ?>">
+                    </a>
+                    <?php endif; ?>
+                    <?php if (defined('NEW_FUNCTION_TRIBE_EGIPTEANS') && NEW_FUNCTION_TRIBE_EGIPTEANS): ?>
+                    <a title="<?php echo TRIBE7; ?>" href="statistiken.php?id=17">
+                        <img class="btn_v7" src="img/x.gif" alt="<?php echo TRIBE7; ?>">
+                    </a>
+                    <?php endif; ?>
+                    <?php if (defined('NEW_FUNCTION_TRIBE_SPARTANS') && NEW_FUNCTION_TRIBE_SPARTANS): ?>
+                    <a title="<?php echo TRIBE8; ?>" href="statistiken.php?id=18">
+                        <img class="btn_v8" src="img/x.gif" alt="<?php echo TRIBE8; ?>">
+                    </a>
+                    <?php endif; ?>
+                    <?php if (defined('NEW_FUNCTION_TRIBE_VIKINGS') && NEW_FUNCTION_TRIBE_VIKINGS): ?>
+                    <a title="<?php echo TRIBE9; ?>" href="statistiken.php?id=19">
+                        <img class="btn_v9" src="img/x.gif" alt="<?php echo TRIBE9; ?>">
+                    </a>
+                    <?php endif; ?>
+                </div>
+
+            </th>
+        </tr>
+
+        <tr>
+            <td></td>
+            <td><?php echo PLAYER; ?></td>
+            <td><?php echo ALLIANCE; ?></td>
+            <td><?php echo POP; ?></td>
+            <td><?php echo VILLAGES; ?></td>
+        </tr>
+    </thead>
+
+    <tbody>
+<?php
+$rankArray = $ranking->getRank();
+
+// ------------------------- PAGINATION SAFE -------------------------
+if (isset($_GET['rank']) && is_numeric($_GET['rank'])) {
+
+    $rank = (int)$_GET['rank'];
+    $count = count($rankArray);
+
+    if ($rank > $count) {
+        $rank = max(1, $count - 1);
+    }
+
+    $multiplier = 1;
+    while ($rank > (20 * $multiplier)) {
+        $multiplier++;
+    }
+
+    $start = 20 * $multiplier - 19;
+
+} else {
+    $start = ($_SESSION['start'] ?? 0) + 1;
+}
+
+// ------------------------- RENDER -------------------------
+if (count($rankArray) > 1) {
+
+    for ($i = $start; $i < $start + 20; $i++) {
+
+        if (!isset($rankArray[$i]['username'])) {
+            continue;
+        }
+
+        $row = $rankArray[$i];
+
+        $isHighlight = ($i == $search);
+
+        echo $isHighlight
+            ? "<tr class=\"hl\"><td class=\"ra fc\">"
+            : "<tr><td class=\"ra \">";
+
+        echo $i . ".</td>";
+
+        // ---------------- PLAYER ----------------
+        echo "<td class=\"pla\">";
+
+        $uid = (int)($row['userid'] ?? 0);
+        $username = htmlspecialchars((string) $row['username'], ENT_QUOTES, 'UTF-8');
+
+        if (!empty($row['access']) && $row['access'] > 2) {
+            echo "<u><a href=\"spieler.php?uid={$uid}\">{$username}</a></u>";
+        } else {
+            echo "<a href=\"spieler.php?uid={$uid}\">{$username}</a>";
+        }
+
+        echo "</td>";
+
+        // ---------------- ALLIANCE ----------------
+        echo "<td class=\"al\">";
+
+        if (!empty($row['aname']) && !empty($row['alliance'])) {
+            $aid = (int)$row['alliance'];
+            $aname = htmlspecialchars((string) $row['aname'], ENT_QUOTES, 'UTF-8');
+            echo "<a href=\"allianz.php?aid={$aid}\">{$aname}</a>";
+        } else {
+            echo "-";
+        }
+
+        echo "</td>";
+
+        // ---------------- POP ----------------
+        echo "<td class=\"pop\">" . (int)($row['totalpop'] ?? 0) . "</td>";
+
+        // ---------------- VILLAGES ----------------
+        echo "<td class=\"vil\">" . (int)($row['totalvillage'] ?? 0) . "</td>";
+
+        echo "</tr>";
+    }
+
+} else {
+    echo "<tr><td class=\"none\" colspan=\"5\">No users found</td></tr>";
+}
+?>
+    </tbody>
+</table>
+
+<?php include("ranksearch.tpl"); ?>

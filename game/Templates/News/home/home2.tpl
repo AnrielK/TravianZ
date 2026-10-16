@@ -1,0 +1,1 @@
+<b><center><?php echo TZ_TRAVIANX; ?></center></b>

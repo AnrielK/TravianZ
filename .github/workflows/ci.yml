@@ -1,0 +1,51 @@
+name: TravianZ – hra na Linuxu (e2e)
+
+# Fast check of the game itself: the same router, control endpoint, installer and automation tick as the
+# iOS app, on PHP 8.3 + MariaDB (Ubuntu), followed by the end-to-end gameplay test.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e-linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP 8.3 + MariaDB
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq mariadb-server php8.3-cli php8.3-mysql php8.3-mbstring php8.3-gd > /dev/null
+          sudo systemctl stop mariadb || true
+          php -v | head -1; mariadbd --version
+      - name: Start (installer runs headlessly)
+        run: scripts/run-local.sh start
+      - name: End-to-end test
+        run: |
+          T=$(python3 -c 'import json;print(json.load(open(".local/secrets.json"))["controlToken"])')
+          A=$(python3 -c 'import json;print(json.load(open(".local/secrets.json"))["adminPassword"])')
+          python3 ios/tests/e2e.py http://127.0.0.1:8080 "$T" "$A" | tee e2e.log
+          grep -q "E2E PASSED" e2e.log
+      - name: PHP errors during the test
+        if: always()
+        run: |
+          echo "== php-errors.log (unique)"; sed 's/^\[[^]]*\] //' .local/logs/php-errors.log 2>/dev/null | grep -v "^#\|Stack trace\|thrown in" | sort | uniq -c | sort -rn | head -40
+          echo "== setup.log"; cat .local/logs/setup.log 2>/dev/null | tail -20
+      - name: Report logs
+        if: always()
+        run: |
+          set +e
+          R="$RUNNER_TEMP/report/tz-run-${{ github.run_number }}-linux"; mkdir -p "$R"
+          echo "status=${{ job.status }} sha=${{ github.sha }}" > "$R/STATUS"
+          cp e2e.log "$R/" 2>/dev/null
+          for f in php-errors.log setup.log mariadb.log server.log; do [ -f .local/logs/$f ] && tail -n 300 .local/logs/$f > "$R/$f"; done
+          .github/scripts/push-ci-logs.sh "$RUNNER_TEMP/report" "${{ secrets.GITHUB_TOKEN }}"

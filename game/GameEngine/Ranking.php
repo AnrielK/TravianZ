@@ -1,0 +1,569 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : Ranking.php                      	                       ##
+##  Type           : Ranking System Backend                                    ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : Dzoki           			                               ##
+##  Refactored by  : Shadow & Ferywir									       ##
+##  Thanks to      : ronix, InCube, Akakori, Elmar & Kirilloid                 ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  URLs:          : https://travianz.org                                      ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+	class Ranking {
+
+		public $rankarray = [];
+		private $rlastupdate;
+
+	/*****************************************
+	Function to get rank
+	*****************************************/	
+	
+		public function getRank() {
+		return $this->rankarray;
+		}
+			
+	/*****************************************
+	Function to finalize rank array
+	*****************************************/		
+			
+		private function finalizeRankArray(array $holder): void {
+			$this->rankarray = array_merge(["pad"], $holder);
+		}
+		
+	/*****************************************
+	Function to start by rank
+	*****************************************/
+	
+		private function setStartByRank($value, $field, $fallback = 1): void {
+			$rank = $this->searchRank($value, $field);
+			if($rank != 0) {
+			$this->getStart($rank);
+			} else {
+        $this->getStart($fallback);
+    }
+}
+		
+	/*****************************************
+	Function to get user rank
+	*****************************************/		
+
+		public function getUserRank($id) {
+				$ranking = $this->getRank();
+					if(count($ranking) > 0) {
+					foreach($ranking as $key => $row) {
+					if($row != "pad" && isset($row['userid']) && $row['userid'] == $id) {
+					return $key;
+					}
+				}
+			}
+			return 0;
+		}
+		
+	/*****************************************
+	Function to Process Ranking Request
+	*****************************************/
+
+		public function procRankReq($get) {
+			global $village, $session;
+			if(isset($get['id'])) {
+			switch($get['id']) {
+        case 1:
+            $this->procRankArray();
+        break;
+        case 8:
+            $this->procHeroRankArray();
+            if($get['hero'] == 0) {
+                $this->getStart(1);
+            } else {
+                $this->setStartByRank($session->uid, "uid");
+            }
+        break;
+        case 11:
+            $this->procRankRaceArray(1);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 12:
+            $this->procRankRaceArray(2);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 13:
+
+            $this->procRankRaceArray(3);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 16:
+            $this->procRankRaceArray(6);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 17:
+            $this->procRankRaceArray(7);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 18:
+            $this->procRankRaceArray(8);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 19:
+            $this->procRankRaceArray(9);
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 31:
+            $this->procAttRankArray();
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 32:
+
+            $this->procDefRankArray();
+            $this->setStartByRank($session->uid, "userid");
+        break;
+        case 2:
+            $this->procVRankArray();
+            $this->setStartByRank($village->wid, "wref");
+        break;
+        case 4:
+            $this->procARankArray();
+            if($get['aid'] == 0) {
+                $this->getStart(1);
+            } else {
+                $this->setStartByRank($get['aid'], "id");
+            }
+        break;
+        case 41:
+            $this->procAAttRankArray();
+            if($get['aid'] == 0) {
+                $this->getStart(1);
+            } else {
+                $this->setStartByRank($get['aid'], "id");
+            }
+        break;
+        case 42:
+            $this->procADefRankArray();
+            if($get['aid'] == 0) {
+                $this->getStart(1);
+            } else {
+                $this->setStartByRank($get['aid'], "id");
+            }
+        break;
+    }
+	} else {
+    $this->procRankArray();
+    $this->setStartByRank($session->uid, "userid");
+		}
+	}
+			
+	/*****************************************
+	Function to Process Ranking
+	*****************************************/
+
+		public function procRank($post) {
+				if(isset($post['ft'])) {
+					switch($post['ft']) {
+						case "r1":
+						case "r11":
+						case "r12":
+						case "r13":
+						case "r31":
+						case "r32":
+							if(isset($post['rank']) && $post['rank'] != "") {
+								$this->getStart($post['rank']);
+							}
+							if(isset($post['name']) && $post['name'] != "") {
+								$this->getStart($this->searchRank(stripslashes($post['name']), "username"));
+							}
+							break;
+						case "r4":
+						case "r42":
+						case "r41":
+							if(isset($post['rank']) && $post['rank'] != "") {
+								$this->getStart($post['rank']);
+							}
+							if(isset($post['name']) && $post['name'] != "") {
+								$this->getStart($this->searchRank(stripslashes($post['name']), "tag"));
+							}
+							break;
+						case "r2":
+						case "r8":
+							if(isset($post['rank']) && $post['rank'] != "") {
+								$this->getStart($post['rank']);
+							}
+							if(isset($post['name']) && $post['name'] != "") {
+								$this->getStart($this->searchRank(stripslashes($post['name']), "name"));
+							}
+							break;
+					}
+				}
+			}
+			
+	/*****************************************
+	Function to get start point
+	*****************************************/	
+
+		private function getStart($search) {
+				$multiplier = 1;
+				if(!is_numeric($search)) {
+					$_SESSION['search'] = htmlspecialchars($search);
+				} else {
+					if($search > count($this->rankarray)) {
+						$search = count($this->rankarray) - 1;
+					}
+					while($search > (20 * $multiplier)) {
+						$multiplier += 1;
+					}
+					$start = 20 * $multiplier - 19 - 1;
+					$_SESSION['search'] = htmlspecialchars($search);
+					$_SESSION['start'] = htmlspecialchars($start);
+				}
+			}
+			
+	/*****************************************
+	Function to get alliance rank
+	*****************************************/		
+
+		public function getAllianceRank($id) {
+			$this->procARankArray();
+			if(count($this->rankarray) <= 1) {
+			return 1;
+		}
+    foreach($this->rankarray as $key => $row) {
+        if($row === "pad") {
+            continue;
+        }
+        if(isset($row['id']) && $row['id'] == $id) {
+            return $key;
+        }
+    }
+    return false;
+	}
+			
+	/*****************************************
+	Function to search in rank
+	*****************************************/		
+
+		public function searchRank($name, $field) {
+				$count = count($this->rankarray);
+				for ($key = 1; $key < $count; $key++) {
+					if (!isset($this->rankarray[$key]) || $this->rankarray[$key] === "pad") {
+					continue;
+				}
+					if (isset($this->rankarray[$key][$field]) &&
+					$this->rankarray[$key][$field] == $name) {
+					return $key;
+				}
+			}
+					if ($field != "userid") {
+					return $name;
+			}
+					return 0;
+			}
+			
+	/*****************************************
+	Function to process rank array
+	*****************************************/		
+
+		public function procRankArray() {
+				global $multisort, $database;
+				
+				if($GLOBALS['db']->countUser() > 0){
+				$holder = array();
+				$tribeCondition = SHOW_NATARS ? "(u.tribe <= 9) AND (u.id > 5 OR u.id = 3)" : "u.tribe IN (1,2,3,6,7,8,9) AND u.id > 5";
+				// BUG REPARAT: access<8/10 excludea Multihunter(8)/Admin(9) dar nu si
+				// conturile banate (access=0, 0 < 8 e adevarat); access>0 adaugat.
+				$q = "
+				SELECT
+				u.id AS userid,
+				u.username,
+				u.oldrank,
+				u.alliance,
+				a.tag AS allitag,
+				SUM(v.pop) AS totalpop,
+				COUNT(CASE WHEN v.type != 99 THEN v.wref END) AS totalvillages
+				FROM " . TB_PREFIX . "users u
+				LEFT JOIN " . TB_PREFIX . "vdata v
+				ON v.owner = u.id
+				LEFT JOIN " . TB_PREFIX . "alidata a
+				ON a.id = u.alliance
+				WHERE
+				u.access > 0 AND u.access < " . (INCLUDE_ADMIN ? 10 : 8) . "
+				AND $tribeCondition
+				GROUP BY
+				u.id
+				ORDER BY
+				totalpop DESC,
+				totalvillages DESC,
+				u.id DESC";
+				$result = (mysqli_query($database->dblink,$q));
+				$datas = [];
+				while($row = mysqli_fetch_assoc($result)) 
+				$datas[] = $row;
+				if (count($datas)) {
+					foreach($datas as $result) {
+						$value['userid'] = $result['userid'];
+						$value['username'] = $result['username'];
+						$value['oldrank'] = $result['oldrank'];
+						$value['alliance'] = $result['alliance'];
+						$value['aname'] = $result['allitag'];
+						$value['totalpop'] = $result['totalpop'];
+						$value['totalvillage'] = $result['totalvillages'];
+						$holder[] = $value;
+					}
+				}
+				$this->finalizeRankArray($holder);
+			    }
+			}
+		
+	/*****************************************
+	Function to process rank race array
+	*****************************************/	
+
+		public function procRankRaceArray($race) {
+				global $multisort, $database;
+				$race = $database->escape((int) $race);
+				$holder = array();
+				// BUG REPARAT: vezi comentariul din procRankArray() de mai sus (access>0 adaugat).
+				$q = "SELECT u.id AS userid, u.tribe, u.username, u.alliance, COALESCE(SUM(v.pop),0) AS totalpop, COUNT(CASE WHEN v.type != 99 THEN v.wref END) AS totalvillages, a.tag AS allitag
+				FROM " . TB_PREFIX . "users u LEFT JOIN " . TB_PREFIX . "vdata v ON v.owner = u.id LEFT JOIN " . TB_PREFIX . "alidata a ON a.id = u.alliance
+				WHERE u.tribe = $race
+				AND u.access > 0 AND u.access < " . (INCLUDE_ADMIN ? "10" : "8") . " AND u.id > 5 GROUP BY u.id ORDER BY totalpop DESC, totalvillages DESC, userid DESC";
+				$result = (mysqli_query($database->dblink,$q));
+				$datas = [];
+				while($row = mysqli_fetch_assoc($result)) {
+				$datas[] = $row;
+				}
+				if(!empty($datas)) {
+					foreach($datas as $result) {
+						$value['userid'] = $result['userid'];
+						$value['username'] = $result['username'];
+						$value['alliance'] = $result['alliance'];
+						$value['aname'] = $result['allitag'];
+						$value['totalpop'] = $result['totalpop'];
+						$value['totalvillage'] = $result['totalvillages'];					
+						$holder[] = $value;
+					}
+				} else {
+					$value['userid'] = 0;
+					$value['username'] = "No User";
+					$value['alliance'] = "";
+					$value['aname'] = "";
+					$value['totalpop'] = "";
+					$value['totalvillage'] = "";
+					$holder[] = $value;
+				}
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process attack rank by array
+	*****************************************/		
+
+		public function procAttRankArray() {
+				global $multisort, $database;
+				$holder = array();
+			// BUG REPARAT: vezi comentariul din procRankArray() mai sus (access>0 adaugat).
+			$q = "SELECT u.id AS userid, u.username, u.apall, COUNT(CASE WHEN v.type != 99 THEN v.wref END) AS totalvillages, COALESCE(SUM(v.pop),0) AS pop
+			FROM " . TB_PREFIX . "users u LEFT JOIN " . TB_PREFIX . "vdata v ON v.owner = u.id
+			WHERE u.apall >= 0 AND u.access > 0 AND u.access < " . (INCLUDE_ADMIN ? 10 : 8) . " AND u.tribe IN (1,2,3,6,7,8,9) AND u.id > 5
+			GROUP BY u.id ORDER BY u.apall DESC, pop DESC, u.id DESC";
+				$result = mysqli_query($database->dblink,$q) or die(mysqli_error($database->dblink));
+				$datas = [];
+				while($row = mysqli_fetch_assoc($result)) {
+					$datas[] = $row;
+				}
+				foreach($datas as $key => $row) {
+					$value['userid'] = $row['userid'];
+					$value['username'] = $row['username'];
+					$value['totalvillages'] = $row['totalvillages'];
+					$value['id'] = $row['userid'];
+					$value['totalpop'] = $row['pop'];
+					$value['apall'] = $row['apall'];
+					$holder[] = $value;
+				}
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process deffence rank by array
+	*****************************************/		
+
+		public function procDefRankArray() {
+			    global $database;
+				$holder = array();
+			// BUG REPARAT: vezi comentariul din procRankArray() mai sus (access>0 adaugat).
+			$q = "SELECT u.id AS userid, u.username, u.dpall, COUNT(CASE WHEN v.type != 99 THEN v.wref END) AS totalvillages, COALESCE(SUM(v.pop),0) AS pop
+			FROM " . TB_PREFIX . "users u LEFT JOIN " . TB_PREFIX . "vdata v ON v.owner = u.id
+			WHERE u.dpall >= 0 AND u.access > 0 AND u.access < " . (INCLUDE_ADMIN ? 10 : 8) . " AND u.tribe IN (1,2,3,6,7,8,9) AND u.id > 5
+			GROUP BY u.id ORDER BY u.dpall DESC, pop DESC, u.id DESC";
+				$result = mysqli_query($database->dblink,$q) or die(mysqli_error($database->dblink));
+				$datas = [];
+				while($row = mysqli_fetch_assoc($result)) {
+					$datas[] = $row;
+				}
+				foreach($datas as $key => $row) {
+					$value['userid'] = $row['userid'];
+					$value['username'] = $row['username'];
+					$value['totalvillages'] = $row['totalvillages'];
+					$value['id'] = $row['userid'];
+					$value['totalpop'] = $row['pop'];
+					$value['dpall'] = $row['dpall'];
+					$holder[] = $value;
+				}
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process V rank array
+	*****************************************/		
+
+		public function procVRankArray() {
+				global $multisort;
+				$array = $GLOBALS['db']->getVRanking();
+				$holder = array();
+				foreach($array as $value) {
+					$coor = $GLOBALS['db']->getCoor($value['wref']);
+					$value['x'] = $coor['x'];
+					$value['y'] = $coor['y'];
+					$value['user'] = $GLOBALS['db']->getUserField($value['owner'], "username", 0);
+					$holder[] = $value;
+				}
+				/**
+				 * Clasamentul satelor se face dupa POPULATIE, nu dupa coordonate.
+				 *
+				 * Inainte se sorta "x" crescator, apoi "y", si abia la egalitate dupa
+				 * populatie - adica practic dupa pozitia pe harta. Toate celelalte
+				 * clasamente (jucatori, aliante, atac, aparare) sorteaza dupa valoare.
+				 *
+				 * Coordonatele raman ca departajare, ca ordinea sa fie stabila cand
+				 * doua sate au aceeasi populatie.
+				 */
+				$holder = $multisort->sorte($holder, "pop", false, 2, "x", true, 2, "y", true, 2);
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process A rank array
+	*****************************************/		
+
+		public function procARankArray() {
+				global $multisort, $database;
+				$array = $GLOBALS['db']->getARanking();
+				$holder = array();
+				foreach($array as $value) {
+					$memberlist = $GLOBALS['db']->getAllMember($value['id']);
+					$totalpop = 0;
+                    $memberIDs = [];
+                    foreach($memberlist as $member) {
+                        $memberIDs[] = $member['id'];
+                    }
+                    $data = $database->getVSumField($memberIDs,"pop");
+                    if (count($data)) {
+                        foreach ($data as $row) {
+                            $totalpop += $row['Total'];
+                        }
+                    }
+					$value['players'] = count($memberlist);
+					$value['totalpop'] = $totalpop;
+					if(!isset($value['avg'])) {
+						$value['avg'] = (count($memberlist) > 0) ? round($totalpop / count($memberlist)) : 0;
+					} else {
+						$value['avg'] = 0;
+					}
+					$holder[] = $value;
+				}
+				$holder = $multisort->sorte($holder, "totalpop", false, 2);
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process hero array
+	*****************************************/		
+
+		public function procHeroRankArray() {
+				global $multisort;
+				$array = $GLOBALS['db']->getHeroRanking();
+				$holder = array();
+				foreach($array as $value) {
+					$value['owner'] = $GLOBALS['db']->getUserField($value['uid'], "username", 0);
+					$value['level'];
+					$value['name'];
+					$value['uid'];
+					$holder[] = $value;
+				}
+				$holder = $multisort->sorte($holder, "experience", false, 2);
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process ATT array
+	*****************************************/		
+
+		public function procAAttRankArray() {
+				global $multisort;
+				$array = $GLOBALS['db']->getARanking();
+				$holder = array();
+				foreach($array as $value) {
+					$memberlist = $GLOBALS['db']->getAllMember($value['id']);
+					$totalap = 0;
+					foreach($memberlist as $member) {
+						$totalap += $member['ap'];
+					}
+					$value['players'] = count($memberlist);
+					$value['totalap'] = $totalap;
+					/**
+					 * BUG: aici era "if($value['avg'] > 0)", dar getARanking()
+					 * selecteaza doar id,name,tag,oldrank,Aap,Adp - cheia 'avg' nu
+					 * exista niciodata. Conditia pica mereu pe ramura else, deci
+					 * media pe membru era intotdeauna 0 in clasament (pe langa
+					 * warning-ul "Undefined array key"). Calculam direct.
+					 */
+					$value['avg'] = (count($memberlist) > 0) ? (int) round($totalap / count($memberlist)) : 0;
+					$holder[] = $value;
+				}
+				$holder = $multisort->sorte($holder, "Aap", false, 2);
+				$this->finalizeRankArray($holder);
+			}
+			
+	/*****************************************
+	Function to process DEFF array
+	*****************************************/		
+
+		public function procADefRankArray() {
+				global $multisort;
+				$array = $GLOBALS['db']->getARanking();
+				$holder = array();
+				foreach($array as $value) {
+					$memberlist = $GLOBALS['db']->getAllMember($value['id']);
+					$totaldp = 0;
+					foreach($memberlist as $member) {
+						$totaldp += $member['dp'];
+					}
+					$value['players'] = count($memberlist);
+					$value['totaldp'] = $totaldp;
+					/**
+					 * BUG: aici era "if($value['avg'] > 0)", dar getARanking()
+					 * selecteaza doar id,name,tag,oldrank,Aap,Adp - cheia 'avg' nu
+					 * exista niciodata. Conditia pica mereu pe ramura else, deci
+					 * media pe membru era intotdeauna 0 in clasament (pe langa
+					 * warning-ul "Undefined array key"). Calculam direct.
+					 */
+					$value['avg'] = (count($memberlist) > 0) ? (int) round($totaldp / count($memberlist)) : 0;
+					$holder[] = $value;
+				}
+				$holder = $multisort->sorte($holder, "Adp", false, 2);
+				$this->finalizeRankArray($holder);
+			}
+		}
+		;
+
+		$ranking = new Ranking;
+
+?>

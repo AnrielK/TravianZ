@@ -1,0 +1,6 @@
+module MariaDBCore {
+    header "MariaDBCore.h"
+    link "c++"
+    link "z"
+    export *
+}

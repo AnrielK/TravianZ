@@ -1,0 +1,64 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : WORLD WONDER			                                   ##
+##  Type           : BUILDING TEMPLATE                                         ##
+## --------------------------------------------------------------------------- ##
+##  Refactored by  : Shadow                                                    ##
+##  Redesign by    : Shadow                                                    ##
+## --------------------------------------------------------------------------- ##
+##  Contact        : cata7007@gmail.com                                        ##
+##  Project        : TravianZ                                                  ##
+##  Test Server    : https://travianz.org                                      ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+
+global $building, $village, $database, $id, $session;
+
+$loopsame = ($building->isCurrent($id) || $building->isLoop($id)) ? 1 : 0;
+$doublebuild = ($building->isCurrent($id) && $building->isLoop($id)) ? 1 : 0;
+
+$vref = (int)$_SESSION['wid'];
+$wwname = $database->getWWName($vref);
+$level = (int)$village->resarray['f'.$id];
+?>
+<div id="build" class="gid40">
+    <a href="#" onClick="return Popup(40,4);" class="build_logo">
+        <?php
+            // Logo-ul preia stilul tribului, ca sa nu vezi altceva aici decat
+            // in sat. Regulile CSS de trib dau DOAR imaginea, nu si inaltimea,
+            // deci logo-ul isi pastreaza cei 100px.
+            include_once('GameEngine/Data/ww_tribe.php');
+            $wwLogoClass = tz_ww_tribe_class($session->tribe ?? 0);
+        ?>
+        <img class="building g40<?php echo $wwLogoClass; ?>" src="img/x.gif" alt="<?php echo WORLD_WONDER; ?>" title="<?php echo WORLD_WONDER;?>" />
+    </a>
+    <h1><?php echo WONDER;?><br /><span class="level"><?php echo LEVEL;?> <?php echo $level;?></span></h1>
+    <p class="build_desc"><?php echo WONDER_DESC;?></p>
+
+    <form action="GameEngine/Game/WorldWonderName.php" method="POST">
+        <?php
+        $disabled = ($level < 1 || $level > 10) ? 'disabled="disabled"' : '';
+        $msg = $level < 0 ? WORLD_WONDER_CHANGE_NAME.'.' : ($level > 10 ? WORLD_WONDER_NOTCHANGE_NAME.'.' : '');
+        if ($msg) echo $msg;
+        ?>
+        <center><br /><?php echo WORLD_WONDER_NAME;?>: 
+            <input class="text" name="wwname" id="wwname" <?php echo $disabled;?> value="<?php echo htmlspecialchars($wwname);?>" maxlength="20">
+        </center>
+        <p class="btn">
+            <button type="submit" tabindex="9" name="s1" id="btn_ok" class="trav_buttons" <?php echo $disabled;?> alt="OK"><?php echo TZ_OK_2; ?></button>
+        </p>
+    </form>
+
+    <?php if (isset($_GET['n'])):?>
+        <div style="text-align: center"><font color="Red"><b><?php echo WORLD_WONDER_NAME_CHANGED;?>.</b></font></div><br />
+    <?php endif;?>
+
+    <?php include("wwupgrade.tpl");?>
+</div>

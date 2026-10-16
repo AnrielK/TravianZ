@@ -1,0 +1,1234 @@
+<?php
+
+#################################################################################
+##              -= YOU MAY NOT REMOVE OR CHANGE THIS NOTICE =-                 ##
+## --------------------------------------------------------------------------- ##
+##  Filename       : HeroItems.php                                             ##
+##  Type           : T4 Hero port - items backend (Phase 2)                    ##
+## --------------------------------------------------------------------------- ##
+##  Developed by   : Shadow 		                                           ##
+##  Project        : TravianZ                                                  ##
+##  GitHub         : https://github.com/Shadowss/TravianZ                      ##
+## --------------------------------------------------------------------------- ##
+##  License        : TravianZ Project                                          ##
+##  Copyright      : TravianZ (c) 2010-2026. All rights reserved.              ##
+## --------------------------------------------------------------------------- ##
+#################################################################################
+##                                                                             ##
+##  Backend for hero inventory / equipment / consumables / silver.             ##
+##  - All statements are prepared (mysqli), all ids cast to int.               ##
+##  - Per-request memoization caches (invalidated on every write), matching    ##
+##    the Database.php cache convention.                                       ##
+##  - Consumables whose game mechanic lands in a later phase (bandages in      ##
+##    battle, cages in oasis attacks, law tablets in loyalty, artwork CP)      ##
+##    return HeroItems::USE_DEFERRED so the caller knows the item exists       ##
+##    but its effect is wired elsewhere. They are NOT silently consumed.       ##
+##                                                                             ##
+#################################################################################
+
+class HeroItems
+{
+    /** useItem() result codes */
+    const USE_OK        = 1;   // consumed, effect applied here
+    const USE_DEFERRED  = 2;   // valid item, but its effect is applied by another subsystem (Phase 3/5)
+    const USE_INVALID   = 0;   // unknown item / not owned / not usable now
+
+    /** @var array per-request caches, keyed by uid */
+    private static $inventoryCache = array();
+    private static $bonusCache     = array();
+
+    /** @var mysqli */
+    private $db;
+
+    public function __construct()
+    {
+        global $database;
+        // Reuse the game's single mysqli link.
+        $this->db = $database->dblink;
+
+        // Catalog is idempotent to include (guarded defines).
+        global $heroItemCatalog, $heroAdventureConfig, $heroSlotIndex;
+        if (!isset($heroItemCatalog)) {
+            include_once __DIR__ . '/Data/hero_items.php';
+        }
+    }
+
+    /* =========================================================================
+     *  READS
+     * ===================================================================== */
+
+    /**
+     * Full inventory of a user (equipped + bag), catalog-joined.
+     * Rows whose itemid vanished from the catalog are returned flagged with
+     * 'orphan' => true instead of being hidden - anomaly surfaced, not altered.
+     */
+    public function getInventory($uid)
+    {
+        global $heroItemCatalog;
+        $uid = (int) $uid;
+
+        if (isset(self::$inventoryCache[$uid])) {
+            return self::$inventoryCache[$uid];
+        }
+
+        $stmt = $this->db->prepare(
+            "SELECT id, uid, heroid, itemid, slot, stat_value, quantity, equipped, tstamp
+               FROM " . TB_PREFIX . "hero_items
+              WHERE uid = ? ORDER BY equipped DESC, slot ASC, itemid ASC"
+        );
+        $stmt->bind_param('i', $uid);
+        $stmt->execute();
+        $res  = $stmt->get_result();
+        $rows = array();
+        while ($row = $res->fetch_assoc()) {
+            if (isset($heroItemCatalog[$row['itemid']])) {
+                $row['def']    = $heroItemCatalog[$row['itemid']];
+                $row['name']   = heroItemName($row['itemid']);
+                $row['orphan'] = false;
+            } else {
+                $row['def']    = null;
+                $row['name']   = 'Unknown item #' . $row['itemid'];
+                $row['orphan'] = true;
+            }
+            $rows[] = $row;
+        }
+        $stmt->close();
+
+        self::$inventoryCache[$uid] = $rows;
+        return $rows;
+    }
+
+    /** Equipped items only, indexed by slot (one item per slot). */
+    public function getEquipped($uid)
+    {
+        $equipped = array();
+        foreach ($this->getInventory($uid) as $row) {
+            if ($row['equipped'] == 1 && !$row['orphan']) {
+                $equipped[(int) $row['slot']] = $row;
+            }
+        }
+        return $equipped;
+    }
+
+    /** Silver balance (0 if the user has no hero row). */
+    public function getSilver($uid)
+    {
+        $uid  = (int) $uid;
+        $stmt = $this->db->prepare("SELECT silver FROM " . TB_PREFIX . "hero WHERE uid = ? LIMIT 1");
+        $stmt->bind_param('i', $uid);
+        $stmt->execute();
+        $stmt->bind_result($silver);
+        $found = $stmt->fetch();
+        $stmt->close();
+        return $found ? (int) $silver : 0;
+    }
+
+    /* =========================================================================
+     *  BONUS AGGREGATION
+     *  Returns a normalized array all later phases read from:
+     *  [
+     *    'fight_strength' => int,   'damage_reduce' => int,
+     *    'regen_hp' => int,         'xp_percent' => int,
+     *    'culture_points' => int,   'train_cavalry' => int, 'train_infantry' => int,
+     *    'vs_natars' => int,        'raid_percent' => int,
+     *    'return_speed' => int,     'speed_own' => int,     'speed_ally' => int,
+     *    'troop_speed_20' => int,   'horse_speed' => int,   'mount_speed' => int,
+     *    'unit_bonus' => [ unitId => perUnitValue, ... ]
+     *  ]
+     * ===================================================================== */
+    public function getBonuses($uid)
+    {
+        $uid = (int) $uid;
+        if (isset(self::$bonusCache[$uid])) {
+            return self::$bonusCache[$uid];
+        }
+
+        $bonuses = array(
+            HB_FIGHT => 0, HB_DMG_REDUCE => 0, HB_REGEN_HP => 0, HB_XP => 0,
+            HB_CP => 0, HB_TRAIN_CAV => 0, HB_TRAIN_INF => 0, HB_VS_NATARS => 0,
+            HB_RAID => 0, HB_RETURN_SPEED => 0, HB_SPEED_OWN => 0, HB_SPEED_ALLY => 0,
+            HB_TROOP_SPEED_20 => 0, HB_HORSE_SPEED => 0, HB_MOUNT_SPEED => 0,
+            HB_UNIT_BONUS => array(),
+        );
+
+        $equipped = $this->getEquipped($uid);
+        $hasHorse = isset($equipped[HSLOT_HORSE]);
+
+        foreach ($equipped as $row) {
+            $def = $row['def'];
+
+            // Spurs count only while a horse is equipped.
+            if (!empty($def['requires_horse']) && !$hasHorse) {
+                continue;
+            }
+
+            foreach ($def['bonus'] as $type => $value) {
+                if ($type === HB_UNIT_BONUS) {
+                    $u = (int) $value['unit'];
+                    if (!isset($bonuses[HB_UNIT_BONUS][$u])) {
+                        $bonuses[HB_UNIT_BONUS][$u] = 0;
+                    }
+                    $bonuses[HB_UNIT_BONUS][$u] += (int) $value['per_unit'];
+                    continue;
+                }
+                if (isset($bonuses[$type])) {
+                    $bonuses[$type] += $this->scaledBonusValue($def, (int) $value);
+                }
+            }
+        }
+
+        self::$bonusCache[$uid] = $bonuses;
+        return $bonuses;
+    }
+
+    /**
+     * Apply the server-speed scaling rules from the design sheet:
+     *   'x2_on_speed' => true   -> value * 2 on speed servers (spurs, horses)
+     *   'x2_on_speed' => false  -> value / 2 on speed servers (culture helmets)
+     *   key absent              -> value unchanged
+     * "Speed server" = SPEED >= 3 (per the sheet's "(1x) / (3x)" notation).
+     */
+    public function scaledBonusValue(array $def, $value)
+    {
+        if (!array_key_exists('x2_on_speed', $def)) {
+            return $value;
+        }
+        $isSpeed = defined('SPEED') && SPEED >= 3;
+        if (!$isSpeed) {
+            return $value;
+        }
+        return $def['x2_on_speed'] ? $value * 2 : (int) floor($value / 2);
+    }
+
+    /* =========================================================================
+     *  WRITES
+     * ===================================================================== */
+
+    /**
+     * Grant an item to a user (adventure loot, auction win, admin).
+     * Consumables (bag slot) stack onto an existing row; gear inserts a new row.
+     * Returns the hero_items.id of the affected row, or 0 on failure.
+     */
+    public function addItem($uid, $itemid, $quantity = 1, $statValue = 0)
+    {
+        global $heroItemCatalog;
+        $uid = (int) $uid; $itemid = (int) $itemid;
+        $quantity = max(1, (int) $quantity); $statValue = (int) $statValue;
+
+        if (!isset($heroItemCatalog[$itemid])) {
+            return 0;
+        }
+        $def  = $heroItemCatalog[$itemid];
+        $slot = (int) $def['slot'];
+        $now  = time();
+
+        if ($slot === HSLOT_BAG) {
+            // Stack consumables.
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "hero_items
+                    SET quantity = quantity + ?, tstamp = ?
+                  WHERE uid = ? AND itemid = ? AND equipped = 0 LIMIT 1"
+            );
+            $stmt->bind_param('iiii', $quantity, $now, $uid, $itemid);
+            $stmt->execute();
+            $affected = $stmt->affected_rows;
+            $stmt->close();
+
+            if ($affected > 0) {
+                $this->invalidateCaches($uid);
+                $row = $this->findRow($uid, $itemid);
+                return $row ? (int) $row['id'] : 0;
+            }
+        }
+
+        $equipped = 0;
+        $stmt = $this->db->prepare(
+            "INSERT INTO " . TB_PREFIX . "hero_items
+                    (uid, heroid, itemid, slot, stat_value, quantity, equipped, tstamp)
+             VALUES (?, 0, ?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param('iiiiiii', $uid, $itemid, $slot, $statValue, $quantity, $equipped, $now);
+        $stmt->execute();
+        $newId = (int) $stmt->insert_id;
+        $stmt->close();
+
+        $this->invalidateCaches($uid);
+        return $newId;
+    }
+
+    /**
+     * Equip an owned item into its slot. Returns true on success.
+     * Rules enforced:
+     *  - item must belong to $uid and not be a consumable
+     *  - weapons ('unit' key) require the LIVING hero to be that exact unit
+     *  - anything already in that slot is unequipped first (atomic enough for
+     *    a per-user action; both statements touch only this user's rows)
+     */
+    /* =========================================================================
+     *  SCHIMB AUR <-> ARGINT (casa de licitatii)
+     * ===================================================================== */
+
+    const EXCHANGE_OK         = 1;
+    const EXCHANGE_NO_HERO    = 2;
+    const EXCHANGE_NOT_ENOUGH = 3;
+    const EXCHANGE_INVALID    = 4;
+    const EXCHANGE_FAILED     = 5;
+
+    /** Cat argint primesti pentru 1 aur (implicit 10, ca in Travian). */
+    public static function silverPerGold()
+    {
+        return defined('HERO_SILVER_PER_GOLD') ? max(1, (int) HERO_SILVER_PER_GOLD) : 10;
+    }
+
+    /** Cat argint costa 1 aur la schimbul invers (implicit 25 - diferenta e marja casei). */
+    public static function silverForOneGold()
+    {
+        return defined('HERO_SILVER_TO_GOLD') ? max(1, (int) HERO_SILVER_TO_GOLD) : 25;
+    }
+
+    /**
+     * Aur -> argint. $gold = cat aur dai.
+     *
+     * Ambele scrieri (scaderea aurului si adaugarea argintului) sunt intr-o
+     * TRANZACTIE: sunt tabele diferite (users si hero), iar fara tranzactie o
+     * eroare intre ele ar lasa jucatorul fara aur si fara argint. Scaderea are
+     * conditia "gold >= ?" chiar in UPDATE, deci doua cereri trimise simultan nu
+     * pot cheltui acelasi aur de doua ori.
+     */
+    public function exchangeGoldToSilver($uid, $gold)
+    {
+        $uid  = (int) $uid;
+        $gold = (int) $gold;
+
+        if ($gold <= 0 || $gold > 100000) {
+            return self::EXCHANGE_INVALID;
+        }
+
+        $silver = $gold * self::silverPerGold();
+
+        return $this->runExchange($uid, $gold, $silver, true);
+    }
+
+    /**
+     * Argint -> aur. $silver = cat ARGINT dai (nu cat aur primesti).
+     *
+     * Asta e citirea naturala a campului din interfata si potriveste Travian:
+     * scrii suma pe care o dai, nu pe cea pe care o primesti. Se schimba doar
+     * multiplii intregi ai ratei; restul de argint sub o unitate de aur ramane
+     * la tine, nu se pierde.
+     */
+    public function exchangeSilverToGold($uid, $silver)
+    {
+        $uid    = (int) $uid;
+        $silver = (int) $silver;
+
+        if ($silver <= 0 || $silver > 100000000) {
+            return self::EXCHANGE_INVALID;
+        }
+
+        $rate = self::silverForOneGold();
+        $gold = intdiv($silver, $rate);
+
+        if ($gold <= 0) {
+            // sub rata de schimb nu se poate obtine nici macar o unitate de aur
+            return self::EXCHANGE_NOT_ENOUGH;
+        }
+
+        // consumam exact cat acopera aurul primit, nu toata suma introdusa
+        return $this->runExchange($uid, $gold, $gold * $rate, false);
+    }
+
+    /**
+     * Executa schimbul. $goldToSilver = true inseamna "dai aur, primesti argint".
+     */
+    private function runExchange($uid, $gold, $silver, $goldToSilver)
+    {
+        // Fara erou nu exista unde tine argintul.
+        if ($this->heroRowId($uid) === 0) {
+            return self::EXCHANGE_NO_HERO;
+        }
+
+        $this->db->begin_transaction();
+
+        try {
+            if ($goldToSilver) {
+                $take = $this->db->prepare(
+                    "UPDATE " . TB_PREFIX . "users SET gold = gold - ? WHERE id = ? AND gold >= ? LIMIT 1"
+                );
+                $take->bind_param('iii', $gold, $uid, $gold);
+                $take->execute();
+                $taken = $take->affected_rows;
+                $take->close();
+
+                if ($taken < 1) {
+                    $this->db->rollback();
+                    return self::EXCHANGE_NOT_ENOUGH;
+                }
+
+                $give = $this->db->prepare(
+                    "UPDATE " . TB_PREFIX . "hero SET silver = silver + ? WHERE uid = ? LIMIT 1"
+                );
+                $give->bind_param('ii', $silver, $uid);
+                $give->execute();
+                $given = $give->affected_rows;
+                $give->close();
+
+                if ($given < 1) {
+                    $this->db->rollback();
+                    return self::EXCHANGE_FAILED;
+                }
+
+            } else {
+                $take = $this->db->prepare(
+                    "UPDATE " . TB_PREFIX . "hero SET silver = silver - ? WHERE uid = ? AND silver >= ? LIMIT 1"
+                );
+                $take->bind_param('iii', $silver, $uid, $silver);
+                $take->execute();
+                $taken = $take->affected_rows;
+                $take->close();
+
+                if ($taken < 1) {
+                    $this->db->rollback();
+                    return self::EXCHANGE_NOT_ENOUGH;
+                }
+
+                $give = $this->db->prepare(
+                    "UPDATE " . TB_PREFIX . "users SET gold = gold + ? WHERE id = ? LIMIT 1"
+                );
+                $give->bind_param('ii', $gold, $uid);
+                $give->execute();
+                $given = $give->affected_rows;
+                $give->close();
+
+                if ($given < 1) {
+                    $this->db->rollback();
+                    return self::EXCHANGE_FAILED;
+                }
+            }
+
+            $this->db->commit();
+
+            return self::EXCHANGE_OK;
+
+        } catch (Throwable $e) {
+            $this->db->rollback();
+            return self::EXCHANGE_FAILED;
+        }
+    }
+
+    /** Id-ul randului de erou al jucatorului, 0 daca nu exista. */
+    private function heroRowId($uid)
+    {
+        $uid  = (int) $uid;
+        $stmt = $this->db->prepare(
+            "SELECT heroid FROM " . TB_PREFIX . "hero WHERE uid = ? LIMIT 1"
+        );
+        $stmt->bind_param('i', $uid);
+        $stmt->execute();
+        $stmt->bind_result($heroid);
+        $found = $stmt->fetch();
+        $stmt->close();
+
+        return $found ? (int) $heroid : 0;
+    }
+
+    /* =========================================================================
+     *  DISPONIBILITATEA EROULUI PENTRU SCHIMBAREA ECHIPAMENTULUI
+     * ===================================================================== */
+
+    /** @var array cache per request: uid => motiv ('' = eroul e acasa) */
+    private static $awayCache = array();
+
+    /**
+     * Motivul pentru care eroul NU poate schimba echipamentul acum.
+     *
+     * Intoarce '' cand eroul e acasa si poate fi echipat, sau una dintre:
+     *   'adventure'     - plecat intr-o aventura
+     *   'attack'        - plecat intr-un atac (singur sau cu trupe), dus sau intors
+     *   'reinforcement' - trimis ca intarire in alt sat
+     *
+     * Comportament ca in Travian original: echipamentul se schimba doar cat timp
+     * eroul e in sat. Eroul MORT nu e blocat - e "acasa", doar fara viata, si in
+     * T4 iti poti pregati echipamentul cat timp astepti invierea.
+     */
+    public function heroAwayReason($uid)
+    {
+        $uid = (int) $uid;
+
+        if (isset(self::$awayCache[$uid])) {
+            return self::$awayCache[$uid];
+        }
+
+        $p = TB_PREFIX;
+
+        /**
+         * FIX: eroul care se INTORCEA dintr-o aventura aparea ca fiind acasa.
+         *
+         * Ciclul unei aventuri e: status 0 (oferta) -> status 1 (dus, miscare
+         * sort_type 20) -> la sosire status devine 2 si se creeaza miscarea de
+         * intoarcere (sort_type 21). Numaram doar status = 1, deci pe tot
+         * drumul de intoarcere eroul "disparea": bara de sus scria "Hero at
+         * home", iar pagina de echipare lasa schimbarea itemelor desi eroul
+         * era inca pe drum. Adaugam si miscarea de intoarcere.
+         */
+        $advBack = defined('MOVEMENT_ADVENTURE_BACK') ? (int) MOVEMENT_ADVENTURE_BACK : 21;
+
+        // ATENTIE: aliasul pentru miscarea de intoarcere NU poate fi "returning" -
+        // e cuvant rezervat in MariaDB (clauza RETURNING) si strica query-ul.
+        // Un singur query, cu motive separate, ca interfata sa poata afisa
+        // exact de ce e blocat. Coloanele `from`/`to` sunt cuvinte rezervate,
+        // de aceea sunt in backticks.
+        $q = "SELECT
+                (SELECT COUNT(*) FROM {$p}hero
+                  WHERE uid = ? AND COALESCE(intraining, 0) = 0) AS hero_exists,
+                (SELECT COUNT(*) FROM {$p}hero_adventure
+                  WHERE uid = ? AND status = 1) AS adventure,
+                (SELECT COUNT(*) FROM {$p}movement m
+                  INNER JOIN {$p}vdata v ON v.wref = m.`to`
+                  WHERE v.owner = ? AND m.proc = 0
+                    AND m.sort_type = {$advBack}) AS adv_return,
+                (SELECT IFNULL(SUM(e.hero), 0) FROM {$p}enforcement e
+                  INNER JOIN {$p}vdata v ON v.wref = e.`from`
+                  WHERE v.owner = ?) AS reinforcement,
+                (SELECT IFNULL(SUM(a.t11), 0) FROM {$p}movement m
+                  INNER JOIN {$p}attacks a ON a.id = m.ref
+                  INNER JOIN {$p}vdata v ON v.wref = m.`from`
+                  WHERE v.owner = ? AND m.proc = 0 AND m.sort_type = 3) AS outgoing,
+                (SELECT IFNULL(SUM(a.t11), 0) FROM {$p}movement m
+                  INNER JOIN {$p}attacks a ON a.id = m.ref
+                  INNER JOIN {$p}vdata v ON v.wref = m.`to`
+                  WHERE v.owner = ? AND m.proc = 0 AND m.sort_type = 4) AS atk_return";
+
+        $stmt = $this->db->prepare($q);
+
+        if (!$stmt) {
+            // daca query-ul nu se poate pregati, nu blocam jucatorul
+            return self::$awayCache[$uid] = '';
+        }
+
+        $stmt->bind_param('iiiiii', $uid, $uid, $uid, $uid, $uid, $uid);
+        $stmt->execute();
+        $stmt->bind_result($heroExists, $adventure, $advReturn, $reinforcement, $outgoing, $atkReturn);
+        $stmt->fetch();
+        $stmt->close();
+
+        $reason = '';
+
+        // Fara erou antrenat nu exista pe cine echipa. Se numara si eroii morti
+        // (randul exista, doar dead = 1): in T4 iti poti pregati echipamentul cat
+        // astepti invierea. Eroii aflati INCA in antrenament (intraining = 1) nu
+        // conteaza - inca nu exista cu adevarat.
+        if ((int) $heroExists === 0) {
+            $reason = 'nohero';
+        } elseif (((int) $adventure + (int) $advReturn) > 0) {
+            // "adventure" acopera ambele picioare ale drumului: dus si intors.
+            // Contractul metodei ramane neschimbat, deci 37_items.tpl continua
+            // sa afiseze acelasi mesaj - doar ca acum si pe drumul de intoarcere.
+            $reason = 'adventure';
+        } elseif (((int) $outgoing + (int) $atkReturn) > 0) {
+            $reason = 'attack';
+        } elseif ((int) $reinforcement > 0) {
+            $reason = 'reinforcement';
+        }
+
+        return self::$awayCache[$uid] = $reason;
+    }
+
+    /** @var array cache per request: uid => detaliile deplasarii */
+    private static $locationCache = array();
+
+    /**
+     * Acelasi motiv ca heroAwayReason(), plus DESTINATIA si TIMPUL RAMAS.
+     *
+     * Intoarce mereu un array:
+     *   'reason'  => '' | 'nohero' | 'adventure' | 'attack' | 'reinforcement'
+     *   'target'  => wref-ul catre care se indreapta (0 daca nu se stie)
+     *   'endtime' => timestamp-ul sosirii (0 = nu e in miscare, ex. intarire
+     *                deja ajunsa, care sta pe loc pana e retrasa)
+     *   'sort'    => sort_type-ul miscarii (3 = dus, 4 = intoarcere), 0 daca nu e cazul
+     *
+     * Costul: query-ul de detalii se face DOAR daca eroul chiar e plecat, deci
+     * cazul obisnuit (erou acasa) ramane exact cat era inainte - un query.
+     */
+    public function heroLocation($uid)
+    {
+        $uid = (int) $uid;
+
+        if (isset(self::$locationCache[$uid])) {
+            return self::$locationCache[$uid];
+        }
+
+        $info = array(
+            'reason'    => $this->heroAwayReason($uid),
+            'target'    => 0,
+            'endtime'   => 0,
+            'sort'      => 0,
+            'returning' => false,   // true = se intoarce acasa
+        );
+
+        if ($info['reason'] === '' || $info['reason'] === 'nohero') {
+            return self::$locationCache[$uid] = $info;
+        }
+
+        $p = TB_PREFIX;
+        $q = '';
+
+        $advOut  = defined('MOVEMENT_ADVENTURE_OUT')  ? (int) MOVEMENT_ADVENTURE_OUT  : 20;
+        $advBack = defined('MOVEMENT_ADVENTURE_BACK') ? (int) MOVEMENT_ADVENTURE_BACK : 21;
+
+        if ($info['reason'] === 'adventure') {
+
+            /**
+             * Citim direct miscarea, nu randul din hero_adventure: la
+             * intoarcere randul e deja status = 2, deci ar fi invizibil.
+             * Satul jucatorului e `from` la dus si `to` la intors, de aceea
+             * IF() alege coloana potrivita pentru verificarea proprietarului.
+             * Destinatia afisata e mereu `to` - locul aventurii la dus,
+             * satul de acasa la intoarcere.
+             */
+            $q = "SELECT m.`to` AS target, m.endtime, m.sort_type
+                    FROM {$p}movement m
+                    INNER JOIN {$p}vdata v ON v.wref = IF(m.sort_type = {$advBack}, m.`to`, m.`from`)
+                   WHERE v.owner = ? AND m.proc = 0 AND m.sort_type IN ({$advOut}, {$advBack})
+                   ORDER BY m.endtime ASC
+                   LIMIT 1";
+
+        } elseif ($info['reason'] === 'attack') {
+
+            // La dus (sort_type 3) satul jucatorului e `from`, la intoarcere
+            // (4) e `to`; IF() alege coloana corecta pentru verificarea
+            // proprietarului. Destinatia afisata e mereu `to`.
+            $q = "SELECT m.`to` AS target, m.endtime, m.sort_type
+                    FROM {$p}movement m
+                    INNER JOIN {$p}attacks a ON a.id = m.ref
+                    INNER JOIN {$p}vdata v ON v.wref = IF(m.sort_type = 4, m.`to`, m.`from`)
+                   WHERE v.owner = ? AND m.proc = 0 AND m.sort_type IN (3, 4) AND a.t11 > 0
+                   ORDER BY m.endtime ASC
+                   LIMIT 1";
+
+        } else {
+
+            // Intarirea a ajuns deja: nu exista miscare, deci nici timp ramas.
+            $q = "SELECT e.vref AS target, 0 AS endtime, 0 AS sort_type
+                    FROM {$p}enforcement e
+                    INNER JOIN {$p}vdata v ON v.wref = e.`from`
+                   WHERE v.owner = ? AND e.hero > 0
+                   LIMIT 1";
+        }
+
+        $stmt = $this->db->prepare($q);
+
+        if (!$stmt) {
+            // instalarile vechi pot sa nu aiba toate tabelele - motivul ramane
+            // valid, doar detaliile lipsesc
+            return self::$locationCache[$uid] = $info;
+        }
+
+        $stmt->bind_param('i', $uid);
+        $stmt->execute();
+        $stmt->bind_result($target, $endtime, $sortType);
+
+        if ($stmt->fetch()) {
+            $info['target']  = (int) $target;
+            $info['endtime'] = (int) $endtime;
+            $info['sort']    = (int) $sortType;
+
+            /**
+             * Drumul de intoarcere, indiferent de unde:
+             *   sort_type 21 = intoarcere din aventura
+             *   sort_type  4 = intoarcere din atac SAU erou rechemat dintr-o
+             *                  intarire (ambele produc aceeasi miscare, deci
+             *                  nu pot fi deosebite - textul e generic)
+             */
+            $info['returning'] = ($info['sort'] === $advBack || $info['sort'] === 4);
+        }
+
+        $stmt->close();
+
+        return self::$locationCache[$uid] = $info;
+    }
+
+    public function equipItem($uid, $rowId)
+    {
+        global $database;
+        $uid = (int) $uid; $rowId = (int) $rowId;
+
+        // Eroul trebuie sa fie in sat. Verificarea e AICI, nu doar in interfata,
+        // ca un POST trimis manual sa nu poata ocoli regula.
+        if ($this->heroAwayReason($uid) !== '') {
+            return false;
+        }
+
+        $row = $this->findRowById($uid, $rowId);
+        if (!$row || $row['orphan'] || (int) $row['def']['slot'] === HSLOT_BAG) {
+            return false;
+        }
+
+        // Weapon unit restriction.
+        if (isset($row['def']['unit'])) {
+            $hero = $database->getHero($uid);
+            $heroUnit = 0;
+            if (is_array($hero)) {
+                foreach ($hero as $h) {
+                    if ($h['dead'] != 1) { $heroUnit = (int) $h['unit']; break; }
+                }
+            }
+            if ($heroUnit !== (int) $row['def']['unit']) {
+                return false;
+            }
+        }
+
+        $slot = (int) $row['def']['slot'];
+
+        // Vacate the slot.
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero_items SET equipped = 0 WHERE uid = ? AND slot = ? AND equipped = 1"
+        );
+        $stmt->bind_param('ii', $uid, $slot);
+        $stmt->execute();
+        $stmt->close();
+
+        // Equip the requested row.
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero_items SET equipped = 1 WHERE uid = ? AND id = ? LIMIT 1"
+        );
+        $stmt->bind_param('ii', $uid, $rowId);
+        $stmt->execute();
+        $ok = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        $this->invalidateCaches($uid);
+
+        /**
+         * Milestone "Hero Master": primul jucator de pe server care are eroul
+         * echipat cu tier 3 pe TOATE cele sase sloturi (coif, armura, mana
+         * dreapta, mana stanga, incaltaminte si Warhorse - calul de tier 3).
+         *
+         * Verificarea se face dupa echipare, cand chiar s-a schimbat ceva.
+         * recordMilestoneIfFirst() foloseste INSERT IGNORE pe o cheie unica,
+         * deci al doilea jucator care ajunge acolo nu suprascrie nimic, iar
+         * apelurile repetate ale aceluiasi jucator nu costa nimic.
+         */
+        if ($ok) {
+            $this->checkHeroMasterMilestone($uid);
+        }
+
+        return $ok;
+    }
+
+    /**
+     * Eroul are tier 3 pe toate cele sase sloturi de echipament?
+     * Slotul 7 (HSLOT_BAG) e pentru consumabile, deci nu conteaza.
+     */
+    public function isFullTier3($uid)
+    {
+        $equipped = $this->getEquipped((int) $uid);
+
+        if (!is_array($equipped)) {
+            return false;
+        }
+
+        $slots = array(HSLOT_HELMET, HSLOT_BODY, HSLOT_RIGHT, HSLOT_LEFT, HSLOT_SHOES, HSLOT_HORSE);
+
+        foreach ($slots as $slot) {
+
+            if (!isset($equipped[$slot]['def']['tier'])) {
+                return false;
+            }
+
+            if ((int) $equipped[$slot]['def']['tier'] !== 3) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** Inregistreaza milestone-ul, daca e cazul. */
+    private function checkHeroMasterMilestone($uid)
+    {
+        global $database;
+
+        if (!defined('NEW_FUNCTIONS_MILESTONES') || !NEW_FUNCTIONS_MILESTONES) {
+            return;
+        }
+
+        if (!$database || !method_exists($database, 'recordMilestoneIfFirst')) {
+            return;
+        }
+
+        if (!$this->isFullTier3($uid)) {
+            return;
+        }
+
+        $database->recordMilestoneIfFirst('hero_master', (int) $uid, 0, '');
+    }
+
+    /** Unequip a specific owned row. Returns true on success. */
+    public function unequipItem($uid, $rowId)
+    {
+        // Acelasi gard ca la echipare (vezi heroAwayReason).
+        if ($this->heroAwayReason($uid) !== '') {
+            return false;
+        }
+
+        $uid = (int) $uid; $rowId = (int) $rowId;
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero_items SET equipped = 0 WHERE uid = ? AND id = ? AND equipped = 1 LIMIT 1"
+        );
+        $stmt->bind_param('ii', $uid, $rowId);
+        $stmt->execute();
+        $ok = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        $this->invalidateCaches($uid);
+        return $ok;
+    }
+
+    /**
+     * Remove quantity from an owned row (used by useItem, auction listing).
+     * Deletes the row when the stack reaches zero. Returns true on success.
+     */
+    public function removeItem($uid, $rowId, $quantity = 1)
+    {
+        $uid = (int) $uid; $rowId = (int) $rowId; $quantity = max(1, (int) $quantity);
+
+        // Conditional decrement - never goes below zero even under races.
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero_items
+                SET quantity = quantity - ?
+              WHERE uid = ? AND id = ? AND quantity >= ? LIMIT 1"
+        );
+        $stmt->bind_param('iiii', $quantity, $uid, $rowId, $quantity);
+        $stmt->execute();
+        $ok = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if ($ok) {
+            $stmt = $this->db->prepare(
+                "DELETE FROM " . TB_PREFIX . "hero_items WHERE uid = ? AND id = ? AND quantity <= 0 LIMIT 1"
+            );
+            $stmt->bind_param('ii', $uid, $rowId);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        $this->invalidateCaches($uid);
+        return $ok;
+    }
+
+    /**
+     * Use a consumable. Applies immediate effects (ointment, scroll, bucket,
+     * book of wisdom, law tablets, artwork); returns USE_DEFERRED for
+     * consumables whose mechanic is wired into battle processing (bandages,
+     * cages - Phase 6) WITHOUT consuming them.
+     * $vid: target village, required for law tablets (loyalty target).
+     * Returns one of the USE_* class constants.
+     */
+    public function useItem($uid, $rowId, $quantity = 1, $vid = 0)
+    {
+        global $database;
+        $uid = (int) $uid; $rowId = (int) $rowId; $quantity = max(1, (int) $quantity);
+
+        $row = $this->findRowById($uid, $rowId);
+        if (!$row || $row['orphan'] || (int) $row['def']['slot'] !== HSLOT_BAG) {
+            return self::USE_INVALID;
+        }
+        if ((int) $row['quantity'] < $quantity) {
+            return self::USE_INVALID;
+        }
+
+        $bonus = $row['def']['bonus'];
+
+        /* ---- Ointment: +1% HP per unit, cap 99, hero must be alive ---- */
+        if (isset($bonus[HB_HEAL_SELF])) {
+            $hero = $this->getLivingHeroRow($uid);
+            if (!$hero) {
+                return self::USE_INVALID;
+            }
+            $health = (float) $hero['health'];
+            if ($health >= 99) {
+                return self::USE_INVALID;
+            }
+            // Only consume as many as actually heal (no waste past the 99 cap).
+            $usable    = min($quantity, (int) ceil(99 - $health));
+            $newHealth = min(99, $health + $usable * (int) $bonus[HB_HEAL_SELF]);
+
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "hero SET health = ? WHERE heroid = ? LIMIT 1"
+            );
+            $heroid = (int) $hero['heroid'];
+            $stmt->bind_param('di', $newHealth, $heroid);
+            $stmt->execute();
+            $stmt->close();
+
+            $this->removeItem($uid, $rowId, $usable);
+            return self::USE_OK;
+        }
+
+        /* ---- Bandaje: readuc in viata o parte din trupele ranite ---- */
+        if (isset($bonus[HB_HEAL_TROOP])) {
+
+            /**
+             * Bandajele scot trupe din spital si le pun inapoi in sat.
+             *
+             * Un bandaj vindeca un procent din raniti (25% cel mic, 33% cel
+             * mare). Se aplica pe satul in care e folosit itemul, deci
+             * jucatorul alege unde conteaza.
+             *
+             * Se consuma DOAR daca a avut ce vindeca - altfel itemul s-ar
+             * pierde degeaba.
+             */
+            global $database;
+
+            $vid = (int) $vid;
+
+            if ($vid <= 0) {
+                return self::USE_INVALID;
+            }
+
+            // satul trebuie sa fie al jucatorului
+            $owner = (int) $database->getVillageField($vid, 'owner');
+
+            if ($owner !== (int) $uid) {
+                return self::USE_INVALID;
+            }
+
+            $wounded = $database->getWounded($vid);
+
+            if (!$wounded) {
+                return self::USE_INVALID;
+            }
+
+            $pct   = max(1, min(100, (int) $bonus[HB_HEAL_TROOP]));
+            $units = array();
+            $heals = array();
+            $total = 0;
+
+            for ($i = 1; $i <= 90; $i++) {
+                $have = isset($wounded['u' . $i]) ? (int) $wounded['u' . $i] : 0;
+
+                if ($have <= 0) {
+                    continue;
+                }
+
+                // cel putin unul, daca exista raniti de tipul asta
+                $heal = max(1, (int) floor($have * $pct / 100));
+                $heal = min($heal, $have);
+
+                $units[] = $i;
+                $heals[] = $heal;
+                $total  += $heal;
+            }
+
+            if ($total <= 0) {
+                return self::USE_INVALID;
+            }
+
+            // scoatem din spital si punem in sat, intr-o tranzactie
+            mysqli_query($this->db, "START TRANSACTION");
+
+            $ok = true;
+
+            foreach ($units as $k => $u) {
+                $q = "UPDATE " . TB_PREFIX . "hospital
+                         SET u" . (int) $u . " = GREATEST(0, u" . (int) $u . " - " . (int) $heals[$k] . ")
+                       WHERE vref = " . $vid . " LIMIT 1";
+
+                if (!mysqli_query($this->db, $q)) {
+                    $ok = false;
+                    break;
+                }
+
+                $q2 = "UPDATE " . TB_PREFIX . "units
+                          SET u" . (int) $u . " = u" . (int) $u . " + " . (int) $heals[$k] . "
+                        WHERE vref = " . $vid . " LIMIT 1";
+
+                if (!mysqli_query($this->db, $q2)) {
+                    $ok = false;
+                    break;
+                }
+            }
+
+            if (!$ok) {
+                mysqli_query($this->db, "ROLLBACK");
+
+                error_log('[TravianZ] bandaj: vindecarea a esuat: '
+                    . mysqli_error($this->db));
+
+                return self::USE_INVALID;
+            }
+
+            mysqli_query($this->db, "COMMIT");
+
+            // un bandaj per folosire: procentul se aplica o singura data
+            $this->removeItem($uid, $rowId, 1);
+
+            return self::USE_OK;
+        }
+
+        /* ---- Scroll: +10 XP each ---- */
+        if (isset($bonus[HB_SCROLL])) {
+            $hero = $this->getLivingHeroRow($uid);
+            if (!$hero) {
+                return self::USE_INVALID;
+            }
+            $xp   = (int) $bonus[HB_SCROLL] * $quantity;
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "hero SET experience = experience + ? WHERE heroid = ? LIMIT 1"
+            );
+            $heroid = (int) $hero['heroid'];
+            $stmt->bind_param('ii', $xp, $heroid);
+            $stmt->execute();
+            $stmt->close();
+
+            $this->removeItem($uid, $rowId, $quantity);
+            return self::USE_OK;
+        }
+
+		/* ---- Bucket of Water: instant free revive of the dead hero ---- */
+		if (isset($bonus[HB_BUCKET])) {
+			// Luăm rândul eroului mort (avem nevoie de heroid + wref)
+			$stmt = $this->db->prepare(
+			"SELECT heroid, wref FROM " . TB_PREFIX . "hero
+			WHERE uid = ? AND dead = 1 LIMIT 1"
+			);
+			$stmt->bind_param('i', $uid);
+			$stmt->execute();
+			$stmt->bind_result($heroid, $wref);
+			$found = $stmt->fetch();
+			$stmt->close();
+
+		if (!$found) {
+			return self::USE_INVALID; // no dead hero to revive
+		}
+
+		$heroid = (int) $heroid;
+		$wref   = (int) $wref;
+		$now    = time();
+
+		$this->db->begin_transaction();
+		try {
+        // 1. Marchează eroul ca viu
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero
+                SET dead = 0, health = 100, inrevive = 0, lastupdate = ?
+              WHERE heroid = ? AND dead = 1 LIMIT 1"
+        );
+        $stmt->bind_param('ii', $now, $heroid);
+        $stmt->execute();
+        $revived = $stmt->affected_rows > 0;
+        $stmt->close();
+
+        if (!$revived) {
+            $this->db->rollback();
+            return self::USE_INVALID;
+        }
+
+        // 2. Pune eroul înapoi în sat (units.hero = 1)
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "units SET hero = 1 WHERE vref = ? LIMIT 1"
+        );
+        $stmt->bind_param('i', $wref);
+        $stmt->execute();
+        $stmt->close();
+
+        $this->db->commit();
+		} catch (Throwable $e) {
+        $this->db->rollback();
+        return self::USE_INVALID;
+		}
+
+		$this->removeItem($uid, $rowId, 1); // one bucket per revive
+		return self::USE_OK;
+		}
+
+        /* ---- Book of Wisdom: reset attribute points ---- */
+        if (isset($bonus[HB_RESET])) {
+            $hero = $this->getLivingHeroRow($uid);
+            if (!$hero) {
+                return self::USE_INVALID;
+            }
+            // FIX: un erou porneste cu 5 puncte la nivelul 0 (vezi INSERT-ul din
+            // 37_train.tpl), iar fiecare nivel mai da 5 (Automation::calculateLevelUp).
+            // Formula veche, "level * 5", uita punctele initiale: cartea returna cu 5
+            // mai putin decat avusese jucatorul, iar la nivelul 0 le pierdea pe toate
+            // si lasa eroul cu 0 puncte si toate atributele pe zero.
+            $level  = (int) $hero['level'];
+            $points = 5 + ($level * 5);
+
+            // resources intra si el in reset (punctele se redistribuie doar cu cartea);
+            // res_type ramane neatins - alegerea resursei se schimba oricand, gratis.
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "hero
+                    SET points = ?, attack = 0, defence = 0, attackbonus = 0,
+                        defencebonus = 0, regeneration = 0, resources = 0
+                  WHERE heroid = ? LIMIT 1"
+            );
+            $heroid = (int) $hero['heroid'];
+            $stmt->bind_param('ii', $points, $heroid);
+            $stmt->execute();
+            $stmt->close();
+
+            $this->removeItem($uid, $rowId, 1);
+            return self::USE_OK;
+        }
+
+        /* ---- Law Tablet: +1% loyalty per tablet on an OWN village, max 125% ---- */
+        if (isset($bonus[HB_LOYALTY])) {
+            $vid = (int) $vid;
+            if ($vid <= 0) {
+                return self::USE_INVALID;
+            }
+            // Village must belong to the user; cap enforced in SQL so
+            // concurrent uses can never overshoot 125.
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "vdata
+                    SET loyalty = LEAST(125, loyalty + ?)
+                  WHERE wref = ? AND owner = ? AND loyalty < 125 LIMIT 1"
+            );
+            $gain = (int) $bonus[HB_LOYALTY] * $quantity;
+            $stmt->bind_param('iii', $gain, $vid, $uid);
+            $stmt->execute();
+            $ok = $stmt->affected_rows > 0;
+            $stmt->close();
+
+            if (!$ok) {
+                return self::USE_INVALID; // not owner, or already at cap
+            }
+            $this->removeItem($uid, $rowId, $quantity);
+            return self::USE_OK;
+        }
+
+        /* ---- Artwork: culture points equal to the account's daily CP
+         *      production, capped at 5000 (normal) / 2500 (speed >= 3).
+         *      users.cp is the accumulator culturePoints() ticks into. ---- */
+        if (isset($bonus[HB_ARTWORK])) {
+            $stmt = $this->db->prepare(
+                "SELECT COALESCE(SUM(cp), 0) FROM " . TB_PREFIX . "vdata WHERE owner = ?"
+            );
+            $stmt->bind_param('i', $uid);
+            $stmt->execute();
+            $stmt->bind_result($dailyCp);
+            $stmt->fetch();
+            $stmt->close();
+
+            $cap  = (defined('SPEED') && SPEED >= 3) ? 2500 : 5000;
+            $gain = min($cap, (int) $dailyCp) * $quantity;
+            if ($gain <= 0) {
+                return self::USE_INVALID;
+            }
+
+            $stmt = $this->db->prepare(
+                "UPDATE " . TB_PREFIX . "users SET cp = cp + ? WHERE id = ? LIMIT 1"
+            );
+            $stmt->bind_param('ii', $gain, $uid);
+            $stmt->execute();
+            $ok = $stmt->affected_rows > 0;
+            $stmt->close();
+
+            if (!$ok) {
+                return self::USE_INVALID;
+            }
+            $this->removeItem($uid, $rowId, $quantity);
+            return self::USE_OK;
+        }
+
+        /* ---- Deferred consumables (mechanic lands in Phase 6 with the UI:
+         *      bandages consume on post-battle healing, cages on oasis
+         *      attacks). NOT consumed here. ---- */
+        if (isset($bonus[HB_HEAL_TROOP]) || isset($bonus[HB_CAGE])) {
+            return self::USE_DEFERRED;
+        }
+
+        return self::USE_INVALID;
+    }
+
+    /* =========================================================================
+     *  SILVER (race-safe conditional updates)
+     * ===================================================================== */
+
+    /** Add silver to the user's hero row. Returns true if a hero row exists. */
+    public function addSilver($uid, $amount)
+    {
+        $uid = (int) $uid; $amount = max(0, (int) $amount);
+        if ($amount === 0) {
+            return true;
+        }
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero SET silver = silver + ? WHERE uid = ? LIMIT 1"
+        );
+        $stmt->bind_param('ii', $amount, $uid);
+        $stmt->execute();
+        $ok = $stmt->affected_rows > 0;
+        $stmt->close();
+        return $ok;
+    }
+
+    /**
+     * Spend silver. The WHERE silver >= ? guard makes this race-safe:
+     * two concurrent spends can never take the balance negative.
+     */
+    public function spendSilver($uid, $amount)
+    {
+        $uid = (int) $uid; $amount = max(0, (int) $amount);
+        if ($amount === 0) {
+            return true;
+        }
+        $stmt = $this->db->prepare(
+            "UPDATE " . TB_PREFIX . "hero
+                SET silver = silver - ?
+              WHERE uid = ? AND silver >= ? LIMIT 1"
+        );
+        $stmt->bind_param('iii', $amount, $uid, $amount);
+        $stmt->execute();
+        $ok = $stmt->affected_rows > 0;
+        $stmt->close();
+        return $ok;
+    }
+
+    /* =========================================================================
+     *  INTERNALS
+     * ===================================================================== */
+
+    private function invalidateCaches($uid)
+    {
+        unset(self::$inventoryCache[(int) $uid], self::$bonusCache[(int) $uid]);
+    }
+
+    private function findRow($uid, $itemid)
+    {
+        foreach ($this->getInventory($uid) as $row) {
+            if ((int) $row['itemid'] === (int) $itemid && $row['equipped'] == 0) {
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    private function findRowById($uid, $rowId)
+    {
+        foreach ($this->getInventory($uid) as $row) {
+            if ((int) $row['id'] === (int) $rowId) {
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    /** Fetch the raw LIVING hero row directly (health/level/points included). */
+    private function getLivingHeroRow($uid)
+    {
+        $uid  = (int) $uid;
+        $stmt = $this->db->prepare(
+            "SELECT heroid, uid, unit, level, points, experience, health, dead
+               FROM " . TB_PREFIX . "hero WHERE uid = ? AND dead = 0 LIMIT 1"
+        );
+        $stmt->bind_param('i', $uid);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $row = $res->fetch_assoc();
+        $stmt->close();
+        return $row ?: null;
+    }
+}

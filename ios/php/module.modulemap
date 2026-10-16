@@ -1,0 +1,7 @@
+module PHPCore {
+    header "PHPCore.h"
+    link "z"
+    link "iconv"
+    link "resolv"
+    export *
+}
