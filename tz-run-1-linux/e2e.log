@@ -1,0 +1,19 @@
+[01] server ready
+    {"installed": true, "db": {"ok": true, "version": "10.11.14-MariaDB-0ubuntu0.24.04.1", "tables": 82}, "users": 1, "villages": 3, "tiles": 10201, "settings": {"SPEED": "10", "WORLD_MAX": "50", "SERVER_GP": "gpack/travian_default/", "HOMEPAGE": "http://127.0.0.1:8080/", "TB_PREFIX": "s1_", "SERVER_LANG": "en", "TIMEZONE": "Europe/Prague", "COMMENCE": "1792124918"}}
+[02] landing pages (logged out)
+[03] register two players
+    uids 7, 8
+[04] log in
+[05] game pages
+[06] upgrade a resource field and finish it via the automation tick
+    field 1: level 0 -> 1, queue 0
+[07] message between players
+[08] send troops (raid) and let them arrive
+    movements: 1
+    reports for attacker: 1
+[09] admin panel
+[10] automation tick is healthy
+    3 ticks in 0.22 s
+[11] log out
+
+E2E PASSED
