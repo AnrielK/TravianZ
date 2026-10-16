@@ -1,0 +1,62 @@
+[16-Oct-2026 08:54:01 Europe/Bucharest] PHP Fatal error:  Uncaught Error: Undefined constant "TZ_SERVER_RUNNING_ON" in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl:72
+Stack trace:
+#0 /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php(138): include()
+#1 /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php(127): require('...')
+#2 {main}
+  thrown in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl on line 72
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Fatal error:  Uncaught Error: Undefined constant "TZ_SERVER_RUNNING_ON" in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl:72
+Stack trace:
+#0 /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php(138): include()
+#1 /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php(127): require('...')
+#2 {main}
+  thrown in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl on line 72
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Warning:  include(wdata_js_here_if_needed): Failed to open stream: No such file or directory in /home/runner/work/TravianZ/TravianZ/.local/www/install/templates/wdata.tpl on line 52
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   3. include() /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php:118
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Warning:  include(): Failed opening 'wdata_js_here_if_needed' for inclusion (include_path='.:/usr/share/php') in /home/runner/work/TravianZ/TravianZ/.local/www/install/templates/wdata.tpl on line 52
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   3. include() /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php:118
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Fatal error:  Uncaught Error: Undefined constant "TZ_SERVER_RUNNING_ON" in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl:72
+Stack trace:
+#0 /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php(138): include()
+#1 /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php(127): require('...')
+#2 {main}
+  thrown in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl on line 72
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Warning:  include(wdata_js_here_if_needed): Failed to open stream: No such file or directory in /home/runner/work/TravianZ/TravianZ/.local/www/install/templates/wdata.tpl on line 52
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   3. include() /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php:118
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Warning:  include(): Failed opening 'wdata_js_here_if_needed' for inclusion (include_path='.:/usr/share/php') in /home/runner/work/TravianZ/TravianZ/.local/www/install/templates/wdata.tpl on line 52
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:01 Europe/Prague] PHP   3. include() /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php:118
+[16-Oct-2026 07:54:01 Europe/Prague] PHP Fatal error:  Uncaught Error: Undefined constant "TZ_SERVER_RUNNING_ON" in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl:72
+Stack trace:
+#0 /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php(138): include()
+#1 /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php(127): require('...')
+#2 {main}
+  thrown in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl on line 72
+[16-Oct-2026 07:54:02 Europe/Prague] PHP Fatal error:  Uncaught Error: Undefined constant "TZ_SERVER_RUNNING_ON" in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl:72
+Stack trace:
+#0 /home/runner/work/TravianZ/TravianZ/.local/www/install/index.php(138): include()
+#1 /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php(127): require('...')
+#2 {main}
+  thrown in /home/runner/work/TravianZ/TravianZ/.local/www/Templates/footer.tpl on line 72
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Warning:  Undefined array key "id" in /home/runner/work/TravianZ/TravianZ/.local/www/celebration.php on line 33
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Warning:  Undefined array key "ft" in /home/runner/work/TravianZ/TravianZ/.local/www/celebration.php on line 33
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Warning:  Undefined array key "id" in /home/runner/work/TravianZ/TravianZ/.local/www/celebration.php on line 57
+[16-Oct-2026 07:54:05 Europe/Prague] PHP Stack trace:
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   1. {main}() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:0
+[16-Oct-2026 07:54:05 Europe/Prague] PHP   2. require() /home/runner/work/TravianZ/TravianZ/ios/runtime/router.php:127
