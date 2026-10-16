@@ -1,0 +1,91 @@
+/Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Data/Application/99D1FDB7-AB78-463E-8710-B5073DEB3511/Documents/logs:
+total 96
+drwxr-xr-x  6 runner  staff    192 Oct 16 05:57 .
+drwxr-xr-x  3 runner  staff     96 Oct 16 05:57 ..
+-rw-rw----  1 runner  staff  30966 Oct 16 06:01 mariadb.log
+-rw-r-----  1 runner  staff   7755 Oct 16 05:58 php-errors.log
+-rw-r--r--  1 runner  staff    393 Oct 16 05:57 server.log
+-rw-rw----  1 runner  staff    421 Oct 16 05:57 setup.log
+
+/Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Data/Application/99D1FDB7-AB78-463E-8710-B5073DEB3511/Library/Application Support/TravianZ:
+total 16
+drwxr-xr-x   8 runner  staff   256 Oct 16 05:57 .
+drwxr-xr-x   3 runner  staff    96 Oct 16 05:57 ..
+drwxr-xr-x  21 runner  staff   672 Oct 16 05:57 mariadb
+drwxr-xr-x   3 runner  staff    96 Oct 16 05:57 run
+-rw-r--r--   1 runner  staff    82 Oct 16 05:57 secrets.json
+drwxr-xr-x   9 runner  staff   288 Oct 16 05:58 sessions
+drwxr-xr-x  69 runner  staff  2208 Oct 16 05:57 www
+-rw-r--r--@  1 runner  staff    18 Oct 16 05:57 www.build-id
+
+/Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Data/Application/99D1FDB7-AB78-463E-8710-B5073DEB3511/Library/Application Support/TravianZ/www:
+total 880
+drwxr-xr-x  69 runner  staff   2208 Oct 16 05:57 .
+drwxr-xr-x   8 runner  staff    256 Oct 16 05:57 ..
+-rw-r--r--   1 runner  staff   7419 Oct 16 05:54 a2b.php
+-rw-r--r--   1 runner  staff  16236 Oct 16 05:54 a2b2.php
+lrwxr-xr-x   1 runner  staff    193 Oct 16 05:57 AC_OETags.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/AC_OETags.js
+-rw-r--r--   1 runner  staff   3930 Oct 16 05:54 activate.php
+drwxr-xr-x  10 runner  staff    320 Oct 16 05:57 Admin
+-rw-r--r--   1 runner  staff   1349 Oct 16 05:54 agb.php
+-rw-r--r--   1 runner  staff  11737 Oct 16 05:54 ajax.php
+-rw-r--r--   1 runner  staff  12136 Oct 16 05:54 allianz.php
+-rw-r--r--   1 runner  staff   4212 Oct 16 05:54 anleitung.php
+-rw-r--r--   1 runner  staff  26728 Oct 16 05:54 anmelden.php
+-rw-r--r--   1 runner  staff   2372 Oct 16 05:54 autoloader.php
+-rw-r--r--   1 runner  staff   4229 Oct 16 05:54 banned.php
+-rw-r--r--   1 runner  staff  10378 Oct 16 05:54 berichte.php
+-rw-r--r--   1 runner  staff  16464 Oct 16 05:54 build_croppers.php
+-rw-r--r--   1 runner  staff  19848 Oct 16 05:54 build.php
+-rw-r--r--   1 runner  staff   2843 Oct 16 05:54 celebration.php
+-rw-r--r--   1 runner  staff  13560 Oct 16 05:54 cron.php
+-rw-r--r--   1 runner  staff  13728 Oct 16 05:54 crop_finder.php
+lrwxr-xr-x   1 runner  staff    184 Oct 16 05:57 css -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/css
+-rw-r--r--   1 runner  staff   5464 Oct 16 05:54 dorf1.php
+-rw-r--r--   1 runner  staff   4840 Oct 16 05:54 dorf2.php
+-rw-r--r--   1 runner  staff   4874 Oct 16 05:54 dorf3.php
+lrwxr-xr-x   1 runner  staff    192 Oct 16 05:57 favicon.ico -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/favicon.ico
+-rw-r--r--   1 runner  staff   2675 Oct 16 05:54 festival.php
+lrwxr-xr-x   1 runner  staff    191 Oct 16 05:57 flaggen.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/flaggen.js
+drwxr-xr-x  48 runner  staff   1536 Oct 16 05:57 GameEngine
+drwxr-xr-x   7 runner  staff    224 Oct 16 05:57 gpack
+drwxr-xr-x  21 runner  staff    672 Oct 16 05:57 img
+-rw-r--r--   1 runner  staff   5463 Oct 16 05:54 impressum.php
+-rw-r--r--   1 runner  staff  12727 Oct 16 05:54 index.php
+drwxr-xr-x   8 runner  staff    256 Oct 16 05:57 installed_1792130249
+-rw-r--r--   1 runner  staff   4915 Oct 16 05:54 karte.php
+-rw-r--r--   1 runner  staff   2831 Oct 16 05:54 karte2.php
+lrwxr-xr-x   1 runner  staff    188 Oct 16 05:57 LICENSE -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/LICENSE
+-rw-r--r--   1 runner  staff   8590 Oct 16 05:54 login.php
+-rw-r--r--   1 runner  staff   4134 Oct 16 05:54 logout.php
+-rw-r--r--   1 runner  staff   1311 Oct 16 05:54 mailme.php
+-rw-r--r--   1 runner  staff   5127 Oct 16 05:54 maintenance.php
+-rw-r--r--   1 runner  staff   3717 Oct 16 05:54 manual.php
+lrwxr-xr-x   1 runner  staff    191 Oct 16 05:57 mt-core.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/mt-core.js
+lrwxr-xr-x   1 runner  staff    191 Oct 16 05:57 mt-full.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/mt-full.js
+lrwxr-xr-x   1 runner  staff    191 Oct 16 05:57 mt-more.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/mt-more.js
+-rw-r--r--   1 runner  staff   6665 Oct 16 05:54 nachrichten.php
+lrwxr-xr-x   1 runner  staff    187 Oct 16 05:57 new.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/new.js
+lrwxr-xr-x   1 runner  staff    188 Oct 16 05:57 new2.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/new2.js
+drwxr-xr-x   8 runner  staff    256 Oct 16 05:57 notification
+-rw-r--r--   1 runner  staff   3881 Oct 16 05:54 packages.php
+-rw-r--r--   1 runner  staff   6632 Oct 16 05:54 password.php
+-rw-r--r--   1 runner  staff   7050 Oct 16 05:54 plus.php
+-rw-r--r--   1 runner  staff   2841 Oct 16 05:54 plus1.php
+-rw-r--r--   1 runner  staff   4253 Oct 16 05:54 rules.php
+lrwxr-xr-x   1 runner  staff    188 Oct 16 05:57 scripts -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/scripts
+drwxr-xr-x   4 runner  staff    128 Oct 16 05:57 Security
+-rw-r--r--   1 runner  staff   8222 Oct 16 05:54 spieler.php
+-rw-r--r--   1 runner  staff   6613 Oct 16 05:54 spielregeln.php
+drwxr-xr-x   7 runner  staff    224 Oct 16 05:57 src
+-rw-r--r--   1 runner  staff   8642 Oct 16 05:54 statistiken.php
+-rw-r--r--   1 runner  staff   8514 Oct 16 05:54 support.php
+drwxr-xr-x  47 runner  staff   1504 Oct 16 05:57 Templates
+-rw-r--r--   1 runner  staff   6541 Oct 16 05:54 terms.php
+-rw-r--r--   1 runner  staff   4139 Oct 16 05:54 tutorial.php
+lrwxr-xr-x   1 runner  staff    191 Oct 16 05:57 uncrypt.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/uncrypt.js
+lrwxr-xr-x   1 runner  staff    187 Oct 16 05:57 unx.js -> /Users/runner/Library/Developer/CoreSimulator/Devices/DC4CD8B3-4457-4153-9087-A0D7A2F9BFD9/data/Containers/Bundle/Application/CF76DCE4-4E92-411D-91CB-8F467DAAC2EB/TravianZ.app/game/unx.js
+drwxr-xr-x   7 runner  staff    224 Oct 16 05:57 var
+-rw-r--r--   1 runner  staff  11762 Oct 16 05:54 version.php
+-rw-r--r--   1 runner  staff  13334 Oct 16 05:54 warsim.php
+-rw-r--r--   1 runner  staff  16977 Oct 16 05:54 winner.php
