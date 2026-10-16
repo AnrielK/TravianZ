@@ -1,0 +1,8 @@
+install 1/6: config form
+install 2/6: database structure
+install 3/6: world data
+   0.1 s
+install 4/6: croppers
+install 5/6: accounts
+install 6/6: finish
+INSTALLED
