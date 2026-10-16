@@ -1,5 +1,14 @@
 # Změny
 
+## 0.1.3 – 16. 10. 2026
+
+- Skutečná příčina chyby s úkolem 3: PCRE v PHP pro iOS (arm64) nenajde shodu u třídy znaků s Unicode
+  vlastnostmi, např. `[\p{L}\p{N}._-]` – na Linuxu se stejnou verzí PHP i PCRE funguje. Kontrola názvu vesnice
+  v `Profile.php` proto na iPhonu odmítla každý název. Vzory jsou přepsané na alternaci
+  `(?:\p{L}|\p{N}|[._\-\[\]()])` se stejným významem; jinde ve hře se tato konstrukce nepoužívá.
+- `/__tz/selftest`: kontrola řetězcových funkcí PHP v aplikaci (vypíše ji e2e test, když selže přejmenování).
+- MariaDB v aplikaci běží s `sql_mode=NO_ENGINE_SUBSTITUTION` (nestriktní, jako Docker se `sql_mode=""`).
+
 ## 0.1.2 – 16. 10. 2026
 
 - Oprava hry (`game/GameEngine/Profile.php`): název vesnice s apostrofem, čárkou, vykřičníkem, `#` apod. se tiše

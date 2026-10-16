@@ -16,3 +16,5 @@
 - Swift typické chyby: `.gray` místo `Color.gray` v ternárních `ShapeStyle`, velké ViewBuildery rozdělit,
   `= nil` u optional vlastností v `@Observable`.
 - Logy z CI jsou ve větvi `ci-logs` (`tz-run-<číslo>-<job>/`).
+- PCRE v iOS buildu PHP nematchuje `\p{..}` uvnitř třídy znaků `[...]` (samostatné `\p{L}` funguje).
+  V kódu, který běží v aplikaci, používej alternaci `(?:\p{L}|\p{N}|[...])`. Ověření: `/__tz/selftest`.
