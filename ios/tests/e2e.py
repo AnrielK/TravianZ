@@ -200,6 +200,21 @@ def main():
             fail(f"field 1 level {before} -> {after} after the tick")
     p1.page("dorf1.php")
 
+    step("quest 3: rename the village (iOS keyboard apostrophe)")
+    sql(f"UPDATE s1_users SET quest = 3 WHERE id = {uid2}")
+    p2.page("dorf1.php")
+    p2.page("spieler.php?s=1")
+    p2.page("spieler.php", {"ft": "p1", "mw": "0", "tag": "", "monat": "", "jahr": "", "ort": "", "be1": "", "be2": "",
+                            "dname0": "Bravo\u2019s Hrad!", "s1": "ok"})
+    vname = scalar(f"SELECT name FROM s1_vdata WHERE wref = {wref2}")
+    _, _, q = p2.req("ajax.php?f=qst")
+    num = re.search(r'"number":"?(-?\d+)', q)
+    print(f"    village name {vname!r}, quest {num and num.group(1)}")
+    if vname != "Bravos Hrad":
+        fail(f"village rename not saved: {vname!r}")
+    if not num or num.group(1) != "3":
+        fail(f"quest 3 not completed after the rename: {q[:200]!r}")
+
     step("message between players")
     p1.page("nachrichten.php?t=1")
     p1.page("nachrichten.php", {"an": n2, "be": "Hello", "message": "Test message from e2e", "ft": "m2",

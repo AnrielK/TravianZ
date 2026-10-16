@@ -1,5 +1,13 @@
 # Změny
 
+## 0.1.2 – 16. 10. 2026
+
+- Oprava hry (`game/GameEngine/Profile.php`): název vesnice s apostrofem, čárkou, vykřičníkem, `#` apod. se tiše
+  neuložil – úkol 3 (přejmenovat vesnici) nešel splnit. Na iPhonu stačil apostrof, který klávesnice píše jako `’`,
+  nebo úprava výchozího názvu „…'s village“. Apostrofy se teď odstraní, ostatní nepovolené znaky nahradí mezerou
+  a název se uloží (ochrana proti XSS zůstává).
+- e2e test: úkol 3 s názvem z iOS klávesnice.
+
 ## 0.1.1 – 16. 10. 2026
 
 - Oprava: nový svět ukazoval „Server will start in“ asi hodinu. Instalátor TravianZ předvyplní čas startu
