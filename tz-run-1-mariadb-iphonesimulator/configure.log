@@ -1,0 +1,250 @@
+-- Performing Test have_CXX__Wwrite_strings - Success
+-- Performing Test have_C__Wcast_function_type_strict
+-- Performing Test have_C__Wcast_function_type_strict - Success
+-- Performing Test have_CXX__Wcast_function_type_strict
+-- Performing Test have_CXX__Wcast_function_type_strict - Success
+-- Performing Test have_C__Wframe_larger_than_16384
+-- Performing Test have_C__Wframe_larger_than_16384 - Success
+-- Performing Test have_CXX__Wframe_larger_than_16384
+-- Performing Test have_CXX__Wframe_larger_than_16384 - Success
+-- Performing Test have_C__Werror_uninitialized_explicit_init
+-- Performing Test have_C__Werror_uninitialized_explicit_init - Failed
+-- Performing Test have_CXX__Werror_uninitialized_explicit_init
+-- Performing Test have_CXX__Werror_uninitialized_explicit_init - Failed
+-- Performing Test have_C__Werror_uninitialized_const_reference
+-- Performing Test have_C__Werror_uninitialized_const_reference - Success
+-- Performing Test have_CXX__Werror_uninitialized_const_reference
+-- Performing Test have_CXX__Werror_uninitialized_const_reference - Success
+== Configuring MariaDB Connector/C
+-- Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR) 
+-- MariaDB Connector C: INSTALL_BINDIR=bin
+-- MariaDB Connector C: INSTALL_LIBDIR=lib
+-- MariaDB Connector C: INSTALL_PCDIR=lib/pkgconfig
+-- MariaDB Connector C: INSTALL_INCLUDEDIR=include/mysql
+-- MariaDB Connector C: INSTALL_DOCSDIR=
+-- MariaDB Connector C: INSTALL_PLUGINDIR=lib/plugin
+-- MariaDB Connector C: INSTALL_MANDIR=man
+-- MariaDB Connector C: LIBMARIADB_STATIC_NAME mariadbclient
+-- Could NOT find ZSTD (missing: ZSTD_LIBRARIES ZSTD_INCLUDE_DIRS) 
+-- Looking for include file linux/limits.h
+-- Looking for include file linux/limits.h - not found
+-- Looking for include file signal.h
+-- Looking for include file signal.h - found
+-- Looking for include file ucontext.h
+-- Looking for include file ucontext.h - found
+-- Looking for makecontext
+-- Looking for makecontext - found
+-- Check size of char *
+-- Check size of char * - done
+-- Check size of long
+-- Check size of long - done
+-- Check size of size_t
+-- Check size of size_t - done
+-- Check size of ushort
+-- Check size of ushort - failed
+-- Check size of socklen_t
+-- Check size of socklen_t - failed
+-- Looking for floor
+-- Looking for floor - found
+-- Looking for pthread_getspecific
+-- Looking for pthread_getspecific - found
+-- Looking for gethostbyname_r
+-- Looking for gethostbyname_r - not found
+-- Looking for setsockopt
+-- Looking for setsockopt - found
+-- TLS disabled
+-- TLS library/version: 
+-- SYSTEM_LIBS zlib;wolfssl
+-- SYSTEM_LIBS: zlib;wolfssl;zlib
+-- SYSTEM processor: 
+-- MariaDB Connector/c configuration:
+-- Static PLUGINS mysql_native_password;mysql_old_password;zlib;pvio_socket
+-- Dynamic PLUGINS dialog;mysql_clear_password
+-- Disabled PLUGINS mysql_old_password
+-- CPack generation: TGZ
+-- SSL support: NONE Libs: wolfssl
+-- Zlib support: ON
+-- ZStd support: FALSE
+-- ASAN support: OFF
+-- ASAN scope support: 
+-- UBSAN support: OFF
+-- MSAN support: OFF
+-- Installation layout: DEFAULT
+-- Include files will be installed in include/mysql
+-- Libraries will be installed in lib
+-- Binaries will be installed in bin
+-- Required: zlib
+-- MariaDB Connector/C 3.4.10
+-- DuckDB: not Linux, skipping
+-- WITH_NUMA=OFF: NUMA memory allocation policy disabled
+-- Performing Test have_C__Wframe_larger_than_49152
+-- Performing Test have_C__Wframe_larger_than_49152 - Success
+-- Performing Test have_CXX__Wframe_larger_than_49152
+-- Performing Test have_CXX__Wframe_larger_than_49152 - Success
+-- Performing Test HAVE_PTHREAD_THREADID_NP
+-- Performing Test HAVE_PTHREAD_THREADID_NP - Success
+-- Looking for gettid
+-- Looking for gettid - not found
+-- Performing Test HAVE_SYS_GETTID
+-- Performing Test HAVE_SYS_GETTID - Success
+-- Performing Test HAVE_GETTHRID
+-- Performing Test HAVE_GETTHRID - Failed
+-- Performing Test HAVE_PTHREAD_GETTHREADID_NP
+-- Performing Test HAVE_PTHREAD_GETTHREADID_NP - Failed
+-- Performing Test HAVE_INTEGER_PTHREAD_SELF
+-- Performing Test HAVE_INTEGER_PTHREAD_SELF - Failed
+-- Looking for include file security/pam_ext.h
+-- Looking for include file security/pam_ext.h - not found
+-- Looking for include file security/pam_appl.h
+-- Looking for include file security/pam_appl.h - not found
+-- Looking for strndup
+-- Looking for strndup - found
+-- Looking for getgrouplist
+-- Looking for getgrouplist - found
+-- Performing Test HAVE_POSIX_GETGROUPLIST
+-- Performing Test HAVE_POSIX_GETGROUPLIST - Failed
+-- Looking for pam_syslog
+-- Looking for pam_syslog - not found
+-- Performing Test HAVE_PEERCRED
+-- Performing Test HAVE_PEERCRED - Failed
+-- Performing Test HAVE_SOCKPEERCRED
+-- Performing Test HAVE_SOCKPEERCRED - Failed
+-- Performing Test HAVE_XUCRED
+-- Performing Test HAVE_XUCRED - Success
+-- Can't build aws_key_management - AWS SDK not available (AWS_SDK_EXTERNAL_PROJECT is not ON and aws-cpp-sdk-kms not found)
+-- Looking for getmntent
+-- Looking for getmntent - not found
+-- Looking for getmntent
+-- Looking for getmntent - not found
+-- Looking for setmntent
+-- Looking for setmntent - not found
+-- Looking for getmntinfo
+-- Looking for getmntinfo - found
+-- Looking for include file sys/mntent.h
+-- Looking for include file sys/mntent.h - not found
+-- Performing Test HAVE_GETMNTINFO_TAKES_statvfs
+-- Performing Test HAVE_GETMNTINFO_TAKES_statvfs - Failed
+-- Looking for include file netdb.h
+-- Looking for include file netdb.h - found
+-- Could NOT find CURL (missing: CURL_LIBRARY CURL_INCLUDE_DIR) 
+-- Hashicorp Key Management plugin requires curl development package
+-- Found BZip2: /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/libbz2.tbd (found version "1.0.8")
+-- Looking for BZ2_bzCompressInit
+-- Looking for BZ2_bzCompressInit - found
+-- Could NOT find LZ4 (missing: LZ4_LIBRARIES LZ4_INCLUDE_DIRS) (Required is at least version "1.6")
+-- Looking for lzma_auto_decoder in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd
+-- Looking for lzma_auto_decoder in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd - found
+-- Looking for lzma_easy_encoder in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd
+-- Looking for lzma_easy_encoder in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd - found
+-- Looking for lzma_lzma_preset in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd
+-- Looking for lzma_lzma_preset in /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator18.5.sdk/usr/lib/liblzma.tbd - found
+-- Could NOT find LibLZMA (missing: LIBLZMA_INCLUDE_DIR) 
+-- Could NOT find LZO (missing: LZO_LIBRARIES LZO_INCLUDE_DIRS) 
+-- Could NOT find Snappy (missing: SNAPPY_LIBRARIES SNAPPY_INCLUDE_DIRS) 
+-- Performing Test HAVE_NO_WARN_DUPLICATE_LIBRARIES
+-- Performing Test HAVE_NO_WARN_DUPLICATE_LIBRARIES - Success
+-- Looking for event.h
+-- Looking for event.h - not found
+-- Found BISON: /opt/homebrew/opt/bison/bin/bison (found suitable version "3.8.2", minimum required is "2.4")
+-- Performing Test have_CXX__Wno_unused_but_set_variable
+-- Performing Test have_CXX__Wno_unused_but_set_variable - Success
+The following features have been enabled:
+
+ * CSV, Storage Engine STATIC
+ * HEAP, Storage Engine STATIC
+ * INNODB_AHI, InnoDB Adaptive Hash Index
+ * INNODB_ROOT_GUESS, Cache index root block descriptors in InnoDB
+ * INNOBASE, Storage Engine STATIC
+ * ARIA, Storage Engine STATIC
+ * MYISAM, Storage Engine STATIC
+ * MYISAMMRG, Storage Engine STATIC
+ * SEQUENCE, Storage Engine STATIC
+ * AUTH_MYSQL_SHA2, Server plugin STATIC
+ * TYPE_GEOM, Server plugin STATIC
+ * TYPE_INET, Server plugin STATIC
+ * TYPE_UUID, Server plugin STATIC
+ * USERSTAT, Server plugin STATIC
+ * PARTITION, Storage Engine STATIC
+ * SQL_SEQUENCE, Storage Engine STATIC
+ * ONLINE_ALTER_LOG, Storage Engine STATIC
+
+-- The following OPTIONAL packages have been found:
+
+ * Git
+ * Threads
+ * BZip2
+ * BISON (required version >= 2.4)
+
+-- The following features have been disabled:
+
+ * WSREP, WSREP replication API (to use, e.g. Galera Replication library)
+ * LIBWRAP, Support for tcp wrappers
+ * SYSTEMD, Systemd scripts and notification support
+ * ARCHIVE, Storage Engine 
+ * BLACKHOLE, Storage Engine 
+ * EXAMPLE, Storage Engine 
+ * FEDERATED, Storage Engine 
+ * FEDERATEDX, Storage Engine 
+ * INNODB_EXTRA_DEBUG, Extra InnoDB debug checks
+ * MARIABACKUP, MariaDB Backup Utility
+ * PERFSCHEMA, Storage Engine 
+ * ROCKSDB, Storage Engine
+ * SPHINX, Storage Engine 
+ * SPIDER, Storage Engine 
+ * TEST_SQL_DISCOVERY, Storage Engine 
+ * AUDIT_NULL, Server plugin 
+ * AUTH_ED25519, Server plugin 
+ * DIALOG_EXAMPLES, Server plugin 
+ * AUTH_TEST_PLUGIN, Server plugin 
+ * QA_AUTH_INTERFACE, Server plugin 
+ * QA_AUTH_SERVER, Server plugin 
+ * QA_AUTH_CLIENT, Server plugin 
+ * AUTH_0X0100, Server plugin 
+ * AUTH_SOCKET, Server plugin 
+ * AWS_KEY_MANAGEMENT, AWS Encryption Key Management Plugin
+ * CRACKLIB_PASSWORD_CHECK, CrackLib Password Validation Plugin
+ * DAEMON_EXAMPLE, Server plugin 
+ * DEBUG_KEY_MANAGEMENT, Server plugin 
+ * DISKS, Server plugin 
+ * EXAMPLE_KEY_MANAGEMENT, Server plugin 
+ * FEEDBACK, Server plugin 
+ * FILE_KEY_MANAGEMENT, Server plugin 
+ * FTEXAMPLE, Server plugin 
+ * FUNC_TEST, Server plugin 
+ * HANDLERSOCKET, Server plugin 
+ * LOCALES, Server plugin 
+ * METADATA_LOCK_INFO, Server plugin 
+ * PASSWORD_REUSE_CHECK, Server plugin 
+ * PROVIDER_BZIP2, Server plugin 
+ * QUERY_CACHE_INFO, Server plugin 
+ * QUERY_RESPONSE_TIME, Server plugin 
+ * SERVER_AUDIT, Server plugin 
+ * SIMPLE_PASSWORD_CHECK, Server plugin 
+ * SQL_ERRLOG, Server plugin 
+ * TEST_SQL_SERVICE, Server plugin 
+ * TYPE_MYSQL_JSON, Server plugin 
+ * TYPE_MYSQL_TIMESTAMP, Server plugin 
+ * TYPE_TEST, Server plugin 
+ * USER_VARIABLES, Server plugin 
+ * TEST_VERSIONING, Server plugin 
+ * THREAD_POOL_INFO, Server plugin 
+ * EMBEDDED_SERVER, Embedded MariaDB Server Library
+
+-- The following OPTIONAL packages have not been found:
+
+ * GSSAPI
+ * CURL
+ * LZ4 (required version >= 1.6)
+ * LibLZMA
+ * LZO
+ * Snappy
+
+-- Configuring done (44.6s)
+-- Generating done (0.3s)
+CMake Warning (unused-cli):
+  Manually-specified variables were not used by the project:
+
+    WITH_READLINE
+
+
+-- Build files have been written to: /Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb

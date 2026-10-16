@@ -1,0 +1,18 @@
+
+[1;34m==> Sources: MariaDB 11.4.13, PCRE2 10.45[0m
+patched /Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/src/mariadb-11.4.13
+
+[1;34m==> Host build of import_executables[0m
+
+[1;34m==> [iphonesimulator] PCRE2[0m
+
+[1;34m==> [iphonesimulator] MariaDB configure[0m
+
+[1;34m==> [iphonesimulator] MariaDB build (mariadbd)[0m
+
+[1;34m==> [iphonesimulator] combine static library[0m
+28 inputs
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool: warning duplicate member name 'hash.c.o' from '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/mysys/libmysys.a(hash.c.o)' and '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/extra/wolfssl/libwolfssl.a(hash.c.o)'
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool: warning duplicate member name 'plugin.cc.o' from '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/plugin/type_uuid/libtype_uuid.a(plugin.cc.o)' and '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/plugin/type_inet/libtype_inet.a(plugin.cc.o)'
+/Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool: warning duplicate member name 'plugin.cc.o' from '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/plugin/type_inet/libtype_inet.a(plugin.cc.o)' and '/Users/runner/work/TravianZ/TravianZ/ios/mariadb/build/iphonesimulator/mariadb/plugin/type_geom/libtype_geom.a(plugin.cc.o)'
+OK MariaDB 11.4.13 iphonesimulator
