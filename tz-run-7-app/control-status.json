@@ -1,0 +1,1 @@
+{"ok":true,"installed":true,"config":true,"installer":false,"php":"8.3.35","settings":{"SPEED":"10","WORLD_MAX":"50","SERVER_GP":"gpack/travian_default/","HOMEPAGE":"http://127.0.0.1:8080/","TB_PREFIX":"s1_","SERVER_LANG":"en","TIMEZONE":"GMT","COMMENCE":"1792132774"},"db":{"ok":true,"version":"11.4.13-MariaDB","tables":82},"users":1,"villages":3,"tiles":10201}

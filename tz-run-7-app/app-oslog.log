@@ -1,0 +1,300 @@
+2026-10-16 06:42:06.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C89] reporting state preparing
+2026-10-16 06:42:06.893 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> setting up Connection 89
+2026-10-16 06:42:06.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_socket_handle_socket_event [C89:2] Socket received CONNECTED event
+2026-10-16 06:42:06.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C89 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:06.893 Df TravianZ[14451:be6f] [com.apple.network:connection] [C89 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.001s
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C89 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.network:connection] [C89 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.001s
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C89] reporting state ready
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.network:connection] [C89 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.001s
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C89] viability_changed_handler(true)
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 89: connected successfully
+2026-10-16 06:42:06.894 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 89: ready C(N) E(N)
+2026-10-16 06:42:06.895 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> now using Connection 89
+2026-10-16 06:42:06.895 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 89: received viability advisory(Y)
+2026-10-16 06:42:06.895 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> sent request, body N 0
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_socket_handle_socket_event [C89:2] Socket received READ_CLOSE event
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> received response, status 200 content U
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 89: read-side closed
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 89: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 89: cleaning up
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.network:connection] [C89 D602F565-F991-4929-A715-0D7298D7FB61 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.network:connection] [C89 D602F565-F991-4929-A715-0D7298D7FB61 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C89 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50777<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.064s, TCP @0.000s took 0.001s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:06.957 E  TravianZ[14451:be6a] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C89:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:06.957 E  TravianZ[14451:be6a] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_flow_disconnected [C89 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C89] reporting state cancelled
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> response ended
+2026-10-16 06:42:06.957 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> done using Connection 89
+2026-10-16 06:42:06.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Summary] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> summary for task success {transaction_duration_ms=66, response_status=200, connection=89, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=1, secure_connection_duration_ms=0, private_relay=false, request_start_ms=3, request_duration_ms=0, response_start_ms=65, response_duration_ms=0, request_bytes=291, request_throughput_kbps=4514, response_bytes=353, response_throughput_kbps=395, cache_hit=false}
+2026-10-16 06:42:06.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <212358D1-4621-4DBA-AA32-CBC66C0D12A7>.<79> finished successfully
+2026-10-16 06:42:08.112 Df TravianZ[14451:c7e1] [com.apple.xpc:connection] [0x60000bd1a490] Re-initialization successful; calling out to event handler with XPC_ERROR_CONNECTION_INTERRUPTED
+2026-10-16 06:42:08.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:08.893 A  TravianZ[14451:be6f] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:08.894 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 90: starting, TC(0x0)
+2026-10-16 06:42:08.894 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 836AE0A9-9446-4EC8-B2C4-BE87C08EDCC2 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:08.894 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:08.896 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.002s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:08.905 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.010s
+2026-10-16 06:42:08.905 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C90] reporting state preparing
+2026-10-16 06:42:08.906 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> setting up Connection 90
+2026-10-16 06:42:08.906 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_socket_handle_socket_event [C90:2] Socket received CONNECTED event
+2026-10-16 06:42:08.906 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_connected [C90 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:08.907 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.012s
+2026-10-16 06:42:08.911 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_connected [C90 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:08.911 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.017s
+2026-10-16 06:42:08.912 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C90] reporting state ready
+2026-10-16 06:42:08.912 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C90 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.017s
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C90] viability_changed_handler(true)
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 90: connected successfully
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 90: ready C(N) E(N)
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> now using Connection 90
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 90: received viability advisory(Y)
+2026-10-16 06:42:08.916 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> sent request, body N 0
+2026-10-16 06:42:08.970 Df TravianZ[14451:be6f] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:09.087 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_socket_handle_socket_event [C90:2] Socket received READ_CLOSE event
+2026-10-16 06:42:09.087 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> received response, status 200 content U
+2026-10-16 06:42:09.088 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 90: read-side closed
+2026-10-16 06:42:09.088 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 90: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:09.088 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 90: cleaning up
+2026-10-16 06:42:09.088 Df TravianZ[14451:be6f] [com.apple.network:connection] [C90 836AE0A9-9446-4EC8-B2C4-BE87C08EDCC2 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:09.089 Df TravianZ[14451:be6f] [com.apple.network:connection] [C90 836AE0A9-9446-4EC8-B2C4-BE87C08EDCC2 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C90 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50785<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.194s, TCP @0.010s took 0.002s
+	bytes in/out: 354/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:09.089 E  TravianZ[14451:be6f] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C90:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:09.089 E  TravianZ[14451:be6f] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:09.090 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_disconnected [C90 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:09.090 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C90] reporting state cancelled
+2026-10-16 06:42:09.090 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> response ended
+2026-10-16 06:42:09.090 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> done using Connection 90
+2026-10-16 06:42:09.092 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Summary] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> summary for task success {transaction_duration_ms=199, response_status=200, connection=90, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=7, secure_connection_duration_ms=0, private_relay=false, request_start_ms=23, request_duration_ms=0, response_start_ms=195, response_duration_ms=3, request_bytes=291, request_throughput_kbps=3087, response_bytes=354, response_throughput_kbps=111, cache_hit=false}
+2026-10-16 06:42:09.092 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <846D0294-CA65-45BD-9102-5CED63DEB9E9>.<80> finished successfully
+2026-10-16 06:42:10.890 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:10.891 A  TravianZ[14451:be6f] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:10.892 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 91: starting, TC(0x0)
+2026-10-16 06:42:10.892 Df TravianZ[14451:be6f] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:10.892 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 6CBEA516-B3ED-45B2-AB9F-F6573F4A55CB 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:10.892 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:10.892 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.000s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.000s
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C91] reporting state preparing
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> setting up Connection 91
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_socket_handle_socket_event [C91:2] Socket received CONNECTED event
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_flow_connected [C91 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:10.893 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.001s
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_flow_connected [C91 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.001s
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C91] reporting state ready
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.network:connection] [C91 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.001s
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C91] viability_changed_handler(true)
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 91: connected successfully
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 91: ready C(N) E(N)
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> now using Connection 91
+2026-10-16 06:42:10.894 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Connection 91: received viability advisory(Y)
+2026-10-16 06:42:10.895 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> sent request, body N 0
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> received response, status 200 content U
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 91: read-side closed
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_socket_handle_socket_event [C91:2] Socket received READ_CLOSE event
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 91: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 91: cleaning up
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.network:connection] [C91 6CBEA516-B3ED-45B2-AB9F-F6573F4A55CB 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:10.953 Df TravianZ[14451:be6f] [com.apple.network:connection] [C91 6CBEA516-B3ED-45B2-AB9F-F6573F4A55CB 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C91 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50800<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.061s, TCP @0.000s took 0.001s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:10.953 E  TravianZ[14451:be6f] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C91:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:10.954 E  TravianZ[14451:be6f] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_disconnected [C91 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C91] reporting state cancelled
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> response ended
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> done using Connection 91
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 91: done
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Summary] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> summary for task success {transaction_duration_ms=63, response_status=200, connection=91, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=1, secure_connection_duration_ms=0, private_relay=false, request_start_ms=3, request_duration_ms=0, response_start_ms=62, response_duration_ms=0, request_bytes=291, request_throughput_kbps=3425, response_bytes=353, response_throughput_kbps=465, cache_hit=false}
+2026-10-16 06:42:10.954 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <11532CF1-3768-443F-B72E-325078CFA30A>.<81> finished successfully
+2026-10-16 06:42:12.890 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:12.892 A  TravianZ[14451:c7e1] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:12.892 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 92: starting, TC(0x0)
+2026-10-16 06:42:12.893 Df TravianZ[14451:c7e1] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:12.894 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 FDB72EBE-ADE1-4B50-A85A-8E95A186DC93 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:12.894 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:12.894 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.000s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:12.895 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.000s
+2026-10-16 06:42:12.895 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C92] reporting state preparing
+2026-10-16 06:42:12.895 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> setting up Connection 92
+2026-10-16 06:42:12.895 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_socket_handle_socket_event [C92:2] Socket received CONNECTED event
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C92 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.001s
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C92 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.001s
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C92] reporting state ready
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] [C92 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.001s
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C92] viability_changed_handler(true)
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 92: connected successfully
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 92: ready C(N) E(N)
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> now using Connection 92
+2026-10-16 06:42:12.896 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 92: received viability advisory(Y)
+2026-10-16 06:42:12.897 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> sent request, body N 0
+2026-10-16 06:42:12.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> received response, status 200 content U
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 92: read-side closed
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 92: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 92: cleaning up
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C92 FDB72EBE-ADE1-4B50-A85A-8E95A186DC93 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C92 FDB72EBE-ADE1-4B50-A85A-8E95A186DC93 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C92 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50814<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.063s, TCP @0.000s took 0.001s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:12.958 E  TravianZ[14451:c7e1] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C92:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:12.958 E  TravianZ[14451:c7e1] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_disconnected [C92 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C92] reporting state cancelled
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> response ended
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> done using Connection 92
+2026-10-16 06:42:12.958 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_socket_handle_socket_event [C92:2] Socket received READ_CLOSE event
+2026-10-16 06:42:12.958 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Summary] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> summary for task success {transaction_duration_ms=67, response_status=200, connection=92, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=1, secure_connection_duration_ms=0, private_relay=false, request_start_ms=5, request_duration_ms=0, response_start_ms=66, response_duration_ms=1, request_bytes=291, request_throughput_kbps=772, response_bytes=353, response_throughput_kbps=343, cache_hit=false}
+2026-10-16 06:42:12.958 Df TravianZ[14451:be6a] [com.apple.CFNetwork:Default] Task <C8164B44-BDFF-4F50-976A-620F26032E24>.<82> finished successfully
+2026-10-16 06:42:14.890 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:14.891 A  TravianZ[14451:be6b] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 93: starting, TC(0x0)
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 2CE1514B-AF25-4DB4-A7FB-7DFA14B14F97 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:14.891 Df TravianZ[14451:be6b] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.000s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.000s
+2026-10-16 06:42:14.891 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C93] reporting state preparing
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> setting up Connection 93
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_socket_handle_socket_event [C93:2] Socket received CONNECTED event
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_connected [C93 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.000s
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_connected [C93 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.000s
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C93] reporting state ready
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C93 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.000s
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C93] viability_changed_handler(true)
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 93: connected successfully
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 93: ready C(N) E(N)
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> now using Connection 93
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 93: received viability advisory(Y)
+2026-10-16 06:42:14.892 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> sent request, body N 0
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> received response, status 200 content U
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 93: read-side closed
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 93: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 93: cleaning up
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.network:connection] [C93 2CE1514B-AF25-4DB4-A7FB-7DFA14B14F97 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.network:connection] [C93 2CE1514B-AF25-4DB4-A7FB-7DFA14B14F97 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C93 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50833<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.059s, TCP @0.000s took 0.000s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:14.950 E  TravianZ[14451:be6b] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C93:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:14.950 E  TravianZ[14451:be6b] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.network:connection] nw_flow_disconnected [C93 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C93] reporting state cancelled
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> response ended
+2026-10-16 06:42:14.950 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> done using Connection 93
+2026-10-16 06:42:14.951 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Summary] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> summary for task success {transaction_duration_ms=59, response_status=200, connection=93, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=0, secure_connection_duration_ms=0, private_relay=false, request_start_ms=1, request_duration_ms=0, response_start_ms=59, response_duration_ms=0, request_bytes=291, request_throughput_kbps=8335, response_bytes=353, response_throughput_kbps=462, cache_hit=false}
+2026-10-16 06:42:14.951 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <90AAF97C-8B07-4FB6-A484-495D101019A3>.<83> finished successfully
+2026-10-16 06:42:16.890 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:16.891 A  TravianZ[14451:be6b] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:16.892 Df TravianZ[14451:be6b] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:16.892 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 94: starting, TC(0x0)
+2026-10-16 06:42:16.892 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 1EF5E7DA-43E2-4A1E-92FF-A542676F75F8 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:16.892 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:16.892 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.000s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.000s
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C94] reporting state preparing
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> setting up Connection 94
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_socket_handle_socket_event [C94:2] Socket received CONNECTED event
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C94 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.001s
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_flow_connected [C94 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.001s
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C94] reporting state ready
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] [C94 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.001s
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C94] viability_changed_handler(true)
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 94: connected successfully
+2026-10-16 06:42:16.893 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 94: ready C(N) E(N)
+2026-10-16 06:42:16.894 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> now using Connection 94
+2026-10-16 06:42:16.894 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Connection 94: received viability advisory(Y)
+2026-10-16 06:42:16.894 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> sent request, body N 0
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> received response, status 200 content U
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 94: read-side closed
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 94: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Connection 94: cleaning up
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C94 1EF5E7DA-43E2-4A1E-92FF-A542676F75F8 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.network:connection] [C94 1EF5E7DA-43E2-4A1E-92FF-A542676F75F8 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C94 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50851<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.065s, TCP @0.000s took 0.001s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:16.957 E  TravianZ[14451:c7e1] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C94:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:16.957 E  TravianZ[14451:c7e1] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_flow_disconnected [C94 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C94] reporting state cancelled
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> response ended
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> done using Connection 94
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Summary] Task <80893471-040A-4949-826F-99253597DE5F>.<84> summary for task success {transaction_duration_ms=66, response_status=200, connection=94, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=1, secure_connection_duration_ms=0, private_relay=false, request_start_ms=2, request_duration_ms=0, response_start_ms=65, response_duration_ms=0, request_bytes=291, request_throughput_kbps=944, response_bytes=353, response_throughput_kbps=533, cache_hit=false}
+2026-10-16 06:42:16.957 Df TravianZ[14451:c7e1] [com.apple.CFNetwork:Default] Task <80893471-040A-4949-826F-99253597DE5F>.<84> finished successfully
+2026-10-16 06:42:18.891 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> resuming, timeouts(300.0, 604800.0) qos(0x19) voucher((null)) activity(00000000-0000-0000-0000-000000000000)
+2026-10-16 06:42:18.892 A  TravianZ[14451:be6b] (Security) SecTrustReportNetworkingAnalytics
+2026-10-16 06:42:18.892 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Connection 95: starting, TC(0x0)
+2026-10-16 06:42:18.892 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 2FAFECCF-AF63-4EA5-B1FC-FDCAEF9976E7 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer, context: com.apple.CFNetwork.NSURLSession.{9BBC393E-FD27-4985-AA09-109FB9414E37}{(null)}{Y}{2}{0x0} (private), proc: 6C11566A-D457-32ED-A819-F95252154412] start
+2026-10-16 06:42:18.892 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 initial parent-flow ((null))] event: path:start @0.000s
+2026-10-16 06:42:18.892 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 waiting parent-flow (satisfied (Path is satisfied), interface: lo0)] event: path:satisfied @0.000s, uuid: 266DD55B-62D8-4736-9EAF-D9746A4ED5FE
+2026-10-16 06:42:18.893 Df TravianZ[14451:be6b] [com.apple.securityd:SecError] SecTrustReportNetworkingAnalytics failed with error: -4
+2026-10-16 06:42:18.893 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:start_connect @0.001s
+2026-10-16 06:42:18.893 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C95] reporting state preparing
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> setting up Connection 95
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_socket_handle_socket_event [C95:2] Socket received CONNECTED event
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_flow_connected [C95 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Transport protocol connected (socket)
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_transport @0.001s
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_flow_connected [C95 127.0.0.1:8080 in_progress socket-flow (satisfied (Path is satisfied), interface: lo0)] Output protocol connected (CFNetworkConnection-2461523596)
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:finish_connect @0.002s
+2026-10-16 06:42:18.894 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C95] reporting state ready
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.network:connection] [C95 127.0.0.1:8080 ready socket-flow (satisfied (Path is satisfied), interface: lo0)] event: flow:changed_viability @0.002s
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.network:connection] nw_connection_send_viability_changed_on_nw_queue [C95] viability_changed_handler(true)
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Connection 95: connected successfully
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Connection 95: ready C(N) E(N)
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> now using Connection 95
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Connection 95: received viability advisory(Y)
+2026-10-16 06:42:18.895 Df TravianZ[14451:e5c2] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> sent request, body N 0
+2026-10-16 06:42:18.955 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> received response, status 200 content U
+2026-10-16 06:42:18.955 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 95: read-side closed
+2026-10-16 06:42:18.955 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 95: final read 0:0, complete[Y], final[N]
+2026-10-16 06:42:18.955 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Connection 95: cleaning up
+2026-10-16 06:42:18.955 Df TravianZ[14451:be6b] [com.apple.network:connection] [C95 2FAFECCF-AF63-4EA5-B1FC-FDCAEF9976E7 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancel
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.network:connection] [C95 2FAFECCF-AF63-4EA5-B1FC-FDCAEF9976E7 127.0.0.1:8080 tcp, url: http://127.0.0.1:8080/__tz/tick, definite, attribution: developer] cancelled
+	[C95 266DD55B-62D8-4736-9EAF-D9746A4ED5FE 127.0.0.1:50866<->127.0.0.1:8080]
+	Connected Path: satisfied (Path is satisfied), viable, interface: lo0
+	Privacy Stance: Not Eligible
+	Duration: 0.063s, TCP @0.001s took 0.000s
+	bytes in/out: 353/291, packets in/out: 3/1, rtt: 0.001s, retransmitted bytes: 0, out-of-order bytes: 0
+	ecn packets sent/acked/marked/lost: 0/0/0/0
+2026-10-16 06:42:18.956 E  TravianZ[14451:be6b] [com.apple.network:connection] nw_protocol_socket_set_no_wake_from_sleep [C95:2] setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:18.956 E  TravianZ[14451:be6b] [com.apple.network:] nw_protocol_socket_set_no_wake_from_sleep setsockopt SO_NOWAKEFROMSLEEP failed [22: Invalid argument]
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.network:connection] nw_flow_disconnected [C95 127.0.0.1:8080 cancelled socket-flow ((null))] Output protocol disconnected
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.network:connection] nw_connection_report_state_with_handler_on_nw_queue [C95] reporting state cancelled
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> response ended
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> done using Connection 95
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6b] [com.apple.network:connection] nw_socket_handle_socket_event [C95:2] Socket received READ_CLOSE event
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Summary] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> summary for task success {transaction_duration_ms=64, response_status=200, connection=95, protocol="http/1.1", domain_lookup_duration_ms=0, connect_duration_ms=1, secure_connection_duration_ms=0, private_relay=false, request_start_ms=3, request_duration_ms=0, response_start_ms=63, response_duration_ms=1, request_bytes=291, request_throughput_kbps=4729, response_bytes=353, response_throughput_kbps=273, cache_hit=false}
+2026-10-16 06:42:18.956 Df TravianZ[14451:be6f] [com.apple.CFNetwork:Default] Task <16C4B55D-F2A1-43D2-9CB1-EC03CC06080A>.<85> finished successfully
