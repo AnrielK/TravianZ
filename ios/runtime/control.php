@@ -160,6 +160,28 @@ if ($tzAction === 'configure') {
     return;
 }
 
+// ------------------------------------------------------------------------------------------- selftest
+// String functions the game relies on, as built into this PHP (diagnostics for the iOS build).
+if ($tzAction === 'selftest') {
+    $name = 'Bravos Hrad';
+    $r = [
+        'php' => PHP_VERSION, 'pcre' => PCRE_VERSION, 'zts' => PHP_ZTS, 'os' => PHP_OS,
+        'pcre_jit' => ini_get('pcre.jit'), 'mb_internal' => function_exists('mb_internal_encoding') ? mb_internal_encoding() : null,
+        'ascii' => preg_match('/^[a-z ]+$/i', $name),
+        'u_flag' => preg_match('/^[a-z ]+$/iu', $name),
+        'prop_L' => preg_match('/^\p{L}+$/u', 'Bravos'),
+        'prop_L_cz' => preg_match('/^\p{L}+$/u', 'Ořechov'),
+        'game_pattern' => preg_match('/^[\p{L}\p{N}._\-\[\]()]+(?: [\p{L}\p{N}._\-\[\]()]+)*$/u', $name),
+        'preg_error' => preg_last_error_msg(),
+        'replace_quote' => preg_replace("/['\x{2018}\x{2019}`\x{00B4}]/u", '', "Bravo\u{2019}s"),
+        'replace_error' => preg_last_error_msg(),
+        'mb_strlen' => function_exists('mb_strlen') ? mb_strlen('Ořechov', 'UTF-8') : null,
+        'mb_substr' => function_exists('mb_substr') ? mb_substr('Ořechov město', 0, 7, 'UTF-8') : null,
+    ];
+    tz_json(['ok' => true] + $r);
+    return;
+}
+
 // ------------------------------------------------------------------------------------------- startnow
 if ($tzAction === 'startnow') {
     $file = "$tzRoot/GameEngine/config.php";

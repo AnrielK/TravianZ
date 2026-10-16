@@ -212,6 +212,7 @@ def main():
     num = re.search(r'"number":"?(-?\d+)', q)
     print(f"    village name {vname!r}, quest {num and num.group(1)}")
     if vname != "Bravos Hrad":
+        print("    selftest:", json.dumps(control("selftest"), ensure_ascii=False))
         mode = sql(f"SELECT @@GLOBAL.sql_mode, @@version, (SELECT location FROM s1_users WHERE id = {uid2})")
         fail(f"village rename not saved: {vname!r}; sql_mode/version {mode}; response {text_of(resp)[:300]!r}")
     if not num or num.group(1) != "3":
