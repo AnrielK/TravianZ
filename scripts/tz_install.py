@@ -63,8 +63,18 @@ class FormDefaults(HTMLParser):
             self.in_form, self.done = False, True
 
 
+def start_fields(tz):
+    """START_DATE / START_TIME one minute ago in the world's time zone (the installer pre-fills Bucharest time)."""
+    import datetime
+    from zoneinfo import ZoneInfo
+    t = datetime.datetime.now(ZoneInfo(tz)) - datetime.timedelta(minutes=1)
+    return t.strftime("%d.%m.%Y"), t.strftime("%H:%M")
+
+
 def overrides(s, base):
+    start_date, start_time = start_fields(s.get("timezone", "Europe/Prague"))
     o = {
+        "start_date": start_date, "start_time": start_time,
         "servername": s.get("server_name", "TravianZ"),
         "tzone": "0," + s.get("timezone", "Europe/Prague"),
         "speed": str(s.get("speed", 10)),

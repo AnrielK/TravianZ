@@ -78,6 +78,17 @@ final class WorldSettingsTests: XCTestCase {
         XCTAssertEqual(plain["new_functions_oasis"], "false")
     }
 
+    func testStartFields() {
+        // 2026-10-16 05:20:00 UTC = 07:20 in Prague (CEST) → one minute earlier
+        let now = Date(timeIntervalSince1970: 1_792_128_000)
+        let s = WorldSettings.startFields(now: now, timeZone: "Europe/Prague")
+        XCTAssertEqual(s.date, "16.10.2026")
+        XCTAssertEqual(s.time, "07:19")
+        let form = WorldSettings().installerForm(defaults: ["start_time": "08:20"], baseURL: "http://x/", database: db,
+                                                 timeZone: "Europe/Prague", now: now)
+        XCTAssertEqual(form["start_time"], "07:19")
+    }
+
     func testLiveDefines() {
         var s = WorldSettings()
         s.graphicPack = "gpack/travian_t4/"

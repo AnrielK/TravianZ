@@ -8,6 +8,7 @@
  *   sql        token   POST query=… → result sets (SQL console + test tools)
  *   configure  token   POST NAME=value … → rewrites define("NAME", …) in GameEngine/config.php
  *   reset      token   drops all game tables and the generated config, restores install/ → fresh installer
+ *   startnow   token   if START_DATE/START_TIME lie in the future (in the world's TIMEZONE), moves them to now
  *
  * The token is the TZ_CONTROL_TOKEN environment variable, sent as the X-TZ-Token header.
  * Database credentials for reset/status come from TZ_DB_* (the same ones the installer gets).
@@ -156,6 +157,38 @@ if ($tzAction === 'configure') {
         @opcache_invalidate($file, true);
     }
     tz_json(['ok' => true, 'changed' => $changed]);
+    return;
+}
+
+// ------------------------------------------------------------------------------------------- startnow
+if ($tzAction === 'startnow') {
+    $file = "$tzRoot/GameEngine/config.php";
+    if (!is_file($file)) {
+        tz_json(['ok' => false, 'error' => 'not installed']);
+        return;
+    }
+    $cfg = (string)file_get_contents($file);
+    try {
+        $tz = new DateTimeZone(tz_config_value($cfg, 'TIMEZONE') ?: date_default_timezone_get());
+    } catch (Throwable $e) {
+        $tz = new DateTimeZone('UTC');
+    }
+    $date = (string)tz_config_value($cfg, 'START_DATE');
+    $time = (string)tz_config_value($cfg, 'START_TIME');
+    $start = DateTime::createFromFormat('d.m.Y H:i', "$date $time", $tz);
+    $now = new DateTime('now', $tz);
+    $out = ['ok' => true, 'start' => "$date $time", 'moved' => false];
+    if ($start === false || $start > $now) {
+        $new = (clone $now)->modify('-1 minute');
+        foreach (['START_DATE' => $new->format('d.m.Y'), 'START_TIME' => $new->format('H:i')] as $name => $value) {
+            $cfg = preg_replace('/define\(\s*(["\'])' . $name . '\1\s*,\s*("[^"]*"|\'[^\']*\')\s*\)\s*;/',
+                'define("' . $name . '", "' . $value . '");', $cfg, 1);
+        }
+        file_put_contents($file, $cfg, LOCK_EX);
+        $out['moved'] = true;
+        $out['start'] = $new->format('d.m.Y H:i');
+    }
+    tz_json($out);
     return;
 }
 

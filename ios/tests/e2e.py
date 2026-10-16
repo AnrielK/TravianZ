@@ -139,6 +139,9 @@ def main():
     for p in ["index.php", "anmelden.php", "login.php", "spielregeln.php", "anleitung.php", "impressum.php",
               "agb.php", "statistiken.php", "warsim.php", "manual.php"]:
         guest.page(p)
+    _, _, login_page = guest.page("login.php")
+    if "Server will start in" in login_page:
+        fail("the world has not started yet (START_DATE/START_TIME in the future)")
     guest.page("var/installed", expect=403, check=False)
     guest.page("GameEngine/config.php", check=False)          # executes, prints nothing
     code, _, body = guest.req("GameEngine/config.php")

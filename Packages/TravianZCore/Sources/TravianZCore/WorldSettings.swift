@@ -41,9 +41,13 @@ public struct WorldSettings: Codable, Equatable, Sendable {
     }
 
     /// Values sent with the installer's config form on top of the form's own defaults.
-    public func installerOverrides(baseURL: String, database: DatabaseCredentials, timeZone: String) -> [String: String] {
+    public func installerOverrides(baseURL: String, database: DatabaseCredentials, timeZone: String,
+                                   now: Date = Date()) -> [String: String] {
         let url = baseURL.hasSuffix("/") ? baseURL : baseURL + "/"
+        let start = Self.startFields(now: now, timeZone: timeZone)
         return [
+            // the installer pre-fills the start with ITS default time zone (Bucharest) – start the world now
+            "start_date": start.date, "start_time": start.time,
             "servername": serverName,
             "tzone": "0," + timeZone,
             "speed": String(max(1, speed)),
@@ -60,11 +64,23 @@ public struct WorldSettings: Codable, Equatable, Sendable {
         ]
     }
 
+    /// "d.m.Y" and "H:i" of one minute ago in the given time zone (START_DATE / START_TIME of config.php).
+    public static func startFields(now: Date, timeZone: String) -> (date: String, time: String) {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: timeZone) ?? .current
+        let t = now.addingTimeInterval(-60)
+        f.dateFormat = "dd.MM.yyyy"
+        let date = f.string(from: t)
+        f.dateFormat = "HH:mm"
+        return (date, f.string(from: t))
+    }
+
     /// The installer form with defaults, overrides and (optionally) every new function switched on.
     public func installerForm(defaults: [String: String], baseURL: String, database: DatabaseCredentials,
-                              timeZone: String) -> [String: String] {
+                              timeZone: String, now: Date = Date()) -> [String: String] {
         var form = defaults
-        for (k, v) in installerOverrides(baseURL: baseURL, database: database, timeZone: timeZone) { form[k] = v }
+        for (k, v) in installerOverrides(baseURL: baseURL, database: database, timeZone: timeZone, now: now) { form[k] = v }
         if newFunctions {
             for (k, v) in form where (k.hasPrefix("new_functions_") || k.hasPrefix("new_function_")) && (v == "true" || v == "false") {
                 form[k] = "true"

@@ -128,6 +128,10 @@ final class GameRuntime {
             appendLog(Paths.setupLog, "\(Date()) installed")
         }
         try await applyLiveSettings()
+        // worlds installed by 0.1 could start up to an hour in the future (installer time zone) – start them now
+        if let moved: StartNowResponse = try? await control("startnow", form: [:]), moved.moved == true {
+            appendLog(Paths.setupLog, "\(Date()) world start moved to \(moved.start ?? "?")")
+        }
     }
 
     /// Writes speed, graphic pack, language and the current URL into config.php (read on every request).

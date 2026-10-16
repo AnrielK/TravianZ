@@ -61,3 +61,10 @@ public struct SimpleResponse: Decodable, Sendable {
     public var changed: [String]?
     public var dropped: Int?
 }
+
+public struct StartNowResponse: Decodable, Sendable {
+    public var ok: Bool
+    public var moved: Bool?
+    public var start: String?
+    public var error: String?
+}

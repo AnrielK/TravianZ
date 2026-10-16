@@ -1,5 +1,12 @@
 # Změny
 
+## 0.1.1 – 16. 10. 2026
+
+- Oprava: nový svět ukazoval „Server will start in“ asi hodinu. Instalátor TravianZ předvyplní čas startu
+  v časovém pásmu Bukurešti, svět ale běží v pásmu zařízení. Aplikace teď posílá start = teď (pásmo zařízení)
+  a při každém spuštění posune start světa, který leží v budoucnu, na teď (`/__tz/startnow`).
+- e2e test hlídá, že přihlašovací stránka neukazuje odpočet startu.
+
 ## 0.1.0 – 16. 10. 2026
 
 - První verze: TravianZ v11 (PHP 8.3 + MariaDB 11.4) běží offline v iOS aplikaci.
